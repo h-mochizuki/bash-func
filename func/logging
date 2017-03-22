@@ -1,0 +1,184 @@
+#!/bin/bash
+# =====================================
+#           ログ出力関数定義
+# =====================================
+
+# ----------------
+#     初期設定
+# ----------------
+# ※ 上書きしたい場合は、このファイルを読み込んだ後で実施してください
+# ログディレクトリ
+LOG_DIR=
+# ログファイル
+LOG_FILE='%file_%timestamp.log'
+# タイムスタンプフォーマット
+TIMESTAMP_FORMAT='%Y%m%d'
+# ログフォーマット
+LOG_FORMAT='[%datetime][%level][%file#%func:%line]:%msg%eol'
+# 日時フォーマット
+DATETIME_FORMAT='%Y-%m-%d %H:%M:%S'
+# 改行コード
+LINE_SEPARATOR='\n'
+
+# ----------------
+#     関数定義
+# ----------------
+abortNotice() {
+  # 異常終了時のエラー表示設定
+  # param1 エラー表示フラグ(on | off)
+  #--
+  # usage) abortNotice [on|off]
+  local flg='ON'
+  if [ "$#" -gt 0 ];then
+    flg=$(echo ${1:-"ON"} | awk '{print toupper($0)}')
+  fi
+  if [ "_$flg" == "_ON" ];then
+    echo "abort notice : on"
+    trap '__abort; exit 1' HUP INT QUIT TERM
+  else
+    trap - HUP
+    trap - INT
+    trap - QUIT
+    trap - TERM
+    echo "abort notice : off"
+  fi
+}
+
+__abort() {
+  # 異常終了時のログ出力
+  __logger 'FATAL' '=================' 1>&2
+  __logger 'FATAL' '==== ABORTED ====' 1>&2
+  __logger 'FATAL' '=================' 1>&2
+  __logger 'FATAL' "An error occurred Exiting..." 1>&2
+}
+
+trace() {
+  # トレースログ設定
+  # 必要なシェルなどで有効にするとコマンドレベルで実行状況を出力します
+  # trapを使用しているため、関数スコープで動作します
+  # ※ 通常はこれを使用するよりも 'bash -x command' を使用した方が効果的です
+  # param1 トレースフラグ(on | off)
+  #--
+  # usage) trace [on|off]
+  local flg='ON'
+  if [ "$#" -gt 0 ];then
+    flg=$(echo ${1:-"ON"} | awk '{print toupper($0)}')
+  fi
+  if [ "_$flg" == "_ON" ];then
+    echo "trace : on"
+    trap '__logger "TRACE" "--exec-> ${BASH_COMMAND[@]//\"/}"' DEBUG
+  else
+    trap - DEBUG
+    echo "trace : off"
+  fi
+}
+
+__logger() {
+  # ロガー
+  # ログテンプレート内のプレイスホルダー"{}"を置換パラメータに置き換えます
+  # param1 ログレベル
+  # param2 ログテンプレート
+  # param3+ 置換パラメータ
+  # returnCd 0:正常 9:パラメータエラー
+  #--
+  # usage) __logger '[INFO|WARN|ERROR]' '{} is {}.' 'This' 'mine'
+  if [ "$#" -lt 1 ];then
+    errorLog "Illegal palameters exception: You should give log-level and message or more parameters."
+    return 9
+  fi
+  readonly local level="$1";shift
+  local message
+  if [ "$#" -eq 0 ];then
+    message=''
+  else
+    message=$(echo "$1" | sed -e 's|/|\\/|g');shift
+  fi
+  readonly local params=( "$@" )
+
+  readonly local logformat="${LOG_FORMAT}"
+  readonly local linesepalator="${LINE_SEPARATOR}"
+  readonly local datetime=$(date +"${DATETIME_FORMAT}")
+  local file=$(basename "${BASH_SOURCE[2]}" | sed -e 's|/|\\/|g')
+  local line="${BASH_LINENO[1]}"
+  local func="${FUNCNAME[2]}"
+  if [ "$level" == "TRACE" ] || [ "$level" == "FATAL" ];then
+    # トレースログ、フェイタルログの場合は取得階層が1つ上になる
+    file=$(basename "${BASH_SOURCE[1]}" | sed -e 's|/|\\/|g')
+    line="${BASH_LINENO[0]}"
+    func="${FUNCNAME[1]}"
+  fi
+
+  local msg="$message"
+  local p
+  for p in "${params[@]}"; do
+    p=$(echo "$p" | sed -e 's|/|\\/|g')
+    msg=$(echo "$msg" | sed -e "s/{}/$p/")
+  done
+
+  # ログ出力
+  readonly local spaces='     '
+  echo -ne "$logformat" | \
+    sed -e "s/%datetime/$datetime/g" \
+        -e "s/%level/$level${spaces:${#level}}/g" \
+        -e "s/%file/$file/g" \
+        -e "s/%func/$func/g" \
+        -e "s/%line/$line/g" \
+        -e "s/%msg/$msg/g" \
+        -e "s/%eol/${linesepalator}/g"
+}
+
+infoLog() {
+  # INFOログ
+  # param1 ログテンプレート
+  # param2+ 置換パラメータ
+  __logger 'INFO' "$@"
+}
+
+warnLog() {
+  # WARNログ
+  # param1 ログテンプレート
+  # param2+ 置換パラメータ
+  __logger 'WARN' "$@" 1>&2
+}
+
+errorLog() {
+  # ERRORログ
+  # param1 ログテンプレート
+  # param2+ 置換パラメータ
+  __logger 'ERROR' "$@" 1>&2
+}
+
+logging() {
+  # ログを出力します
+  # input-stream 入力ストリーム
+  # param1 ログファイル名（なければデフォルト値）
+  # param2+ 対象処理（入力ストリーム優先）
+  readonly local timestamp=$(date +"${TIMESTAMP_FORMAT}")
+  local basefile=$(echo "$0" | sed -e 's/^-*//')
+  local logfile=$(echo "$LOG_FILE" | sed -e "s/%timestamp/$timestamp/g" -e "s/%file/$(basename ${basefile%.*})/g")
+  if [ "$#" -gt 0 ];then
+    if [ $(echo "$1" | grep -c '/') -eq 0 ];then
+      logfile="${LOG_DIR:-$(dirname $0))}/${1}";shift
+    else
+      logfile="${1}";shift
+    fi
+  fi
+  local cmd
+  if [ "$#" -gt 0 ];then
+    cmd="$1";shift
+  fi
+  readonly local args=( "$@" )
+  dir="$(dirname $logfile)"
+  if [ ! -d "$dir" ];then
+    echo "'$dir' is not found."
+    mkdir -p "$dir"
+    echo "'$dir' is ceated."
+  fi
+  if [ -t 0 ]; then
+    if [ "${cmd:+_}" == "_" ];then
+      "$cmd" "${args[@]}" | tee -a "$logfile"
+    fi
+  else
+    cat - | tee -a "$logfile"
+  fi
+}

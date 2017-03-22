@@ -1,0 +1,98 @@
+#!/bin/bash
+# =====================================
+#              評価関数定義
+# =====================================
+base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
+source "${base}/logging"
+
+# ----------------
+#     関数定義
+# ----------------
+isInstalled() {
+  # 指定されたコマンドが実行可能かを返します
+  # param1 コマンドやファンクション
+  # returnCd 0:実行可能 1:実行不可
+  if [ "$#" -eq 0 ];then
+    return 1
+  fi
+  local target="$1"
+  local targetType="$(type -t ${target})"
+  if [[ "${targetType}" == "builtin" ]] || [[ "${targetType}" == "function" ]];then
+    return 0
+  elif [[ "${targetType}" == "file" ]] && $(isExecutable "$(type -P ${target})");then
+    return 0
+  elif [[ "${targetType}" == "alias" ]] && $(isExecutable "$(type -P ${target})");then
+    return 0
+  else
+    return 1
+  fi
+}
+
+isExecutable() {
+  # 指定されたファイルが実行可能かを返します
+  # param1 ファイルパス
+  # returnCd 0:実行可能 1:実行不可
+  if [ "$#" -eq 0 ];then
+    return 1
+  fi
+  local target="$1"
+  if [[ -z "${target+x}" ]];then
+    return 1
+  elif [[ -x "${target}" ]];then
+    return 0
+  else
+    return 1
+  fi
+}
+
+assert() {
+  # 渡されたコマンドを実行して、エラーだった場合には全体の処理を終了します
+  # param1+ 実行コマンド
+  # exitCd 1:処理エラー
+  if [ "$#" -gt 0 ];then
+    local cmd="$1";shift
+    local args=( "$@" )
+    "$cmd" "${args[@]}" || if [ true ]; then
+      __logger 'ERROR' "!!FAILED!! -exec-> $cmd ${args[@]//\"/}"
+      exit 1
+    fi
+  fi
+}
+
+try() {
+  # catch句にエラーを届けるための前処理を実施します
+  [[ $- = *e* ]]; SAVED_OPT_E=$?
+  set +e
+}
+
+catch() {
+  # エラーが発生したかを後続に返します
+  # 後続処理では次のように処理を始めてください
+  #   catch || { sub-shells }
+  export EXCEPTION_CD=$?
+  (( $SAVED_OPT_E )) && set +e
+  return "${EXCEPTION_CD}"
+}
+
+throw() {
+  # 指定された終了コードで処理を終了します
+  # param1: 終了コード
+  # param2+: エラーログ内容
+  local exitCd="${1}";shift
+  if [[ ! -z "${exitCd+x}" ]] && [[ "${exitCd}" -ne 0 ]];then
+    if [[ $# -ne 0 ]];then
+      __logger 'ERROR' "$@"
+    fi
+    exit "${exitCd}"
+  fi
+}
+
+throwErrors() {
+  # 以降の処理でエラー時に終了するようにします
+  set -e
+}
+
+ignoreErrors() {
+  # 以降の処理でエラー時にも処理を継続するようにします
+  set +e
+}

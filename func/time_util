@@ -1,0 +1,100 @@
+#!/bin/bash
+# =====================================
+#           時間計測関係関数定義
+# =====================================
+base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
+source "${base}/arr"
+source "${base}/str"
+
+# ----------------
+#     初期設定
+# ----------------
+# 時間単位（ナノ秒, マイクロ秒, ミリ秒, 秒, 分, 時間）
+TIME_UNIT_NAMES=( "NANOSECONDS" "MICROSECONDS" "MILLISECONDS" "SECONDS" "MINUTES" "HOURS" )
+TIME_UNITS=( "ns" "us" "ms" "s" "min" "h" )
+
+# ----------------
+#     関数定義
+# ----------------
+__nanoseconds() {
+  local baseTime="$1";shift
+  local unit="${1:-NANOSECONDS}"
+  local scale="/$(__scaleTimeUnitDiff NANOSECONDS $unit)"
+
+  if str.isNumber "${baseTime}"; then
+    echo "NumberFormatError : '${baseTime}'" >&2
+    exit 1
+  fi
+  if $(! arr.hasElement "${unit}" "${TIME_UNIT_NAMES[@]}");then
+    echo "IllegalTimeUnitError : '${unit}'" >&2
+    exit 1
+  fi
+
+  local integer="${baseTime%.*}${zeroFill}"
+  local decimal="${baseTime##*.}000000000000"
+  if [[ "${unit}" == "MICROSECONDS" ]];then
+    echo "${integer}${decimal:0:3}"
+  elif [[ "${unit}" == "MILLISECONDS" ]];then
+    echo "${integer}${decimal:0:6}"
+  elif [[ "${unit}" == "SECONDS" ]];then
+    echo "${integer}${decimal:0:9}"
+  elif [[ "${unit}" == "MINUTES" ]];then
+    echo "${integer}${decimal:0:9} * 60" | bc
+  elif [[ "${unit}" == "HOURS" ]];then
+    echo "${integer}${decimal:0:9} * 3600" | bc
+  else
+    echo "${integer}"
+  fi
+}
+
+__scaleTimeUnitDiff() {
+  # ２つの時間単位の倍率を返します
+  # param1 時間単位1
+  # param2 時間単位2
+  # return 時間単位の倍率
+  # returnCd 0:正常 1:引数エラー
+  local fromUnit="${1:-NANOSECONDS}";shift
+  local toUnit="${1:-NANOSECONDS}";shift
+  if $(! arr.hasElement "${fromUnit}" "${TIME_UNIT_NAMES[@]}") || $(! arr.hasElement "${toUnit}" "${TIME_UNIT_NAMES[@]}");then
+    echo "IllegalTimeUnitError : '${fromUnit}' '${toUnit}'" >&2
+    exit 1
+  fi
+  if [ $(arr.indexOf "${fromUnit}" "${TIME_UNIT_NAMES[@]}") -gt $(arr.indexOf "${toUnit}" "${TIME_UNIT_NAMES[@]}") ];then
+    local tmpUnit="${fromUnit}"
+    fromUnit="${toUnit}"
+    toUnit="${tmpUnit}"
+  fi
+  if [[ "${fromUnit}" == "${toUnit}" ]];then
+    echo 1
+  elif [[ "${fromUnit}" == "NANOSECONDS" ]] && [[ "${toUnit}" == "MICROSECONDS" ]];then
+    echo 1000
+  elif [[ "${fromUnit}" == "NANOSECONDS" ]] && [[ "${toUnit}" == "MILLISECONDS" ]];then
+    echo 1000000
+  elif [[ "${fromUnit}" == "NANOSECONDS" ]] && [[ "${toUnit}" == "SECONDS" ]];then
+    echo 1000000000
+  elif [[ "${fromUnit}" == "NANOSECONDS" ]] && [[ "${toUnit}" == "MINUTES" ]];then
+    echo 60000000000
+  elif [[ "${fromUnit}" == "NANOSECONDS" ]] && [[ "${toUnit}" == "HOURS" ]];then
+    echo 3600000000000
+  elif [[ "${fromUnit}" == "MICROSECONDS" ]] && [[ "${toUnit}" == "MILLISECONDS" ]];then
+    echo 1000
+  elif [[ "${fromUnit}" == "MICROSECONDS" ]] && [[ "${toUnit}" == "SECONDS" ]];then
+    echo 1000000
+  elif [[ "${fromUnit}" == "MICROSECONDS" ]] && [[ "${toUnit}" == "MINUTES" ]];then
+    echo 60000000
+  elif [[ "${fromUnit}" == "MICROSECONDS" ]] && [[ "${toUnit}" == "HOURS" ]];then
+    echo 3600000000
+  elif [[ "${fromUnit}" == "MILLISECONDS" ]] && [[ "${toUnit}" == "SECONDS" ]];then
+    echo 1000
+  elif [[ "${fromUnit}" == "MILLISECONDS" ]] && [[ "${toUnit}" == "MINUTES" ]];then
+    echo 60000
+  elif [[ "${fromUnit}" == "MILLISECONDS" ]] && [[ "${toUnit}" == "HOURS" ]];then
+    echo 3600000
+  elif [[ "${fromUnit}" == "SECONDS" ]] && [[ "${toUnit}" == "MINUTES" ]];then
+    echo 60
+  elif [[ "${fromUnit}" == "SECONDS" ]] && [[ "${toUnit}" == "HOURS" ]];then
+    echo 3600
+  elif [[ "${fromUnit}" == "MINUTES" ]] && [[ "${toUnit}" == "HOURS" ]];then
+    echo 60
+  fi
+}
