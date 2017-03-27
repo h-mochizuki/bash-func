@@ -4,7 +4,7 @@
 # =====================================
 
 setup() {
-  load $BATS_TEST_DIRNAME/../func/str
+  load $BATS_TEST_DIRNAME/../../func/str
 }
 
 @test "str.match == false : empty" {

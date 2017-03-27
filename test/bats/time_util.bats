@@ -5,7 +5,7 @@
 
 setup() {
   # テスト対象モジュールの読込み
-  load $BATS_TEST_DIRNAME/../func/time_util
+  load $BATS_TEST_DIRNAME/../../func/time_util
 }
 
 @test "__scaleTimeUnitDiff HOGE : error" {

@@ -4,7 +4,7 @@
 # =====================================
 
 setup() {
-  load $BATS_TEST_DIRNAME/../func/assertion
+  load $BATS_TEST_DIRNAME/../../func/assertion
   EXEC_FILE="${BATS_TMPDIR}/execfile"
   touch "${EXEC_FILE}"
   chmod +x "${EXEC_FILE}"
