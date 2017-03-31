@@ -5,66 +5,66 @@
 
 setup() {
   # テスト対象モジュールの読込み
-  load $BATS_TEST_DIRNAME/../../func/logging
+  load $BATS_TEST_DIRNAME/../../func/log
   # テスト用にフォーマットを変更
   LOG_FORMAT='[%level]%msg'
 }
 
-@test "infoLog output : empty" {
-  run infoLog
+@test "log.info output : empty" {
+  run log.info
   echo "status: ${status}"
   echo "output: ${output[@]}"
   [[ "$status" == 0 ]]
   [[ "${output[0]}" == '[INFO ]' ]]
 }
 
-@test "infoLog output" {
-  run infoLog 'This is {} TEST' 'infoLog'
+@test "log.info output" {
+  run log.info 'This is {} TEST' 'log.info'
   echo "status: ${status}"
   echo "output: ${output[@]}"
   [[ "$status" == 0 ]]
-  [[ "${output[0]}" == '[INFO ]This is infoLog TEST' ]]
+  [[ "${output[0]}" == '[INFO ]This is log.info TEST' ]]
 }
 
-@test "warnLog output" {
-  run warnLog 'This is {} TEST' 'warnLog'
+@test "log.warn output" {
+  run log.warn 'This is {} TEST' 'log.warn'
   echo "status: ${status}"
   echo "output: ${output[@]}"
   [[ "$status" == 0 ]]
-  [[ "${output[0]}" == '[WARN ]This is warnLog TEST' ]]
+  [[ "${output[0]}" == '[WARN ]This is log.warn TEST' ]]
 }
 
-@test "errorLog output" {
-  run errorLog 'This is {} TEST' 'errorLog'
+@test "log.error output" {
+  run log.error 'This is {} TEST' 'log.error'
   echo "status: ${status}"
   echo "output: ${output[@]}"
   [[ "$status" == 0 ]]
-  [[ "${output[0]}" == '[ERROR]This is errorLog TEST' ]]
+  [[ "${output[0]}" == '[ERROR]This is log.error TEST' ]]
 }
 
-@test "infoLog output - multiline" {
-  run infoLog 'This is {} TEST\nCan you hear me?' 'infoLog'
+@test "log.info output - multiline" {
+  run log.info 'This is {} TEST\nCan you hear me?' 'log.info'
   echo "status: ${status}"
   echo "output: ${output[@]}"
   [[ "$status" == 0 ]]
-  [[ "${output[0]}" == '[INFO ]This is infoLog TEST
+  [[ "${output[0]}" == '[INFO ]This is log.info TEST
 Can you hear me?' ]]
 }
 
-@test "warnLog output - multiline" {
-  run warnLog 'This is {} TEST\nCan you hear me?' 'warnLog'
+@test "log.warn output - multiline" {
+  run log.warn 'This is {} TEST\nCan you hear me?' 'log.warn'
   echo "status: ${status}"
   echo "output: ${output[@]}"
   [[ "$status" == 0 ]]
-  [[ "${output[0]}" == '[WARN ]This is warnLog TEST
+  [[ "${output[0]}" == '[WARN ]This is log.warn TEST
 Can you hear me?' ]]
 }
 
-@test "errorLog output - multiline" {
-  run errorLog 'This is {} TEST\nCan you hear me?' 'errorLog'
+@test "log.error output - multiline" {
+  run log.error 'This is {} TEST\nCan you hear me?' 'log.error'
   echo "status: ${status}"
   echo "output: ${output[@]}"
   [[ "$status" == 0 ]]
-  [[ "${output[0]}" == '[ERROR]This is errorLog TEST
+  [[ "${output[0]}" == '[ERROR]This is log.error TEST
 Can you hear me?' ]]
 }

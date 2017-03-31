@@ -16,8 +16,8 @@ arr.indexOf() {
     echo -1
     return 1
   fi
-  readonly local target="$1";shift
-  readonly local elements=( "$@" )
+  local target="$1";shift
+  local elements=( "$@" )
   local i
   for i in "${!elements[@]}";do
     if [[ "${elements[i]}" == "${target}" ]];then
@@ -34,8 +34,8 @@ arr.hasElement() {
   # param1 指定要素
   # param2+ 配列要素
   # returnCd 0:含まれる 1:含まれない
-  readonly local target="$1";shift
-  readonly local elements=( "$@" )
+  local target="$1";shift
+  local elements=( "$@" )
   local i
   for e in "${elements[@]}";do
     if [[ "${e}" == "${target}" ]];then
@@ -65,8 +65,8 @@ arr.last() {
   # 配列の最後の要素を返します
   # param1+ 配列要素
   # return 配列の最後の要素
-  readonly local args=( "$@" )
-  readonly local size=${#args[@]}
+  local args=( "$@" )
+  local size=${#args[@]}
   if [[ "$size" -gt 0 ]];then
     echo "${args[$size-1]}"
   fi

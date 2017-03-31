@@ -1,0 +1,134 @@
+#!/bin/bash
+# =====================================
+#            計測関係関数定義
+# =====================================
+
+# ----------------
+#     初期設定
+# ----------------
+# ※ 上書きしたい場合は、このファイルを読み込んだ後で実施してください
+# コマンド処理時間計測フォーマット
+ELAPSED_FORMAT='[elapsed %-S sec]'
+
+# ----------------
+#     関数定義
+# ----------------
+watch.elapsed() {
+  # コマンド処理時間計測を実施します
+  # param1 コマンド
+  # param2+ コマンドパラメータ
+  # return コマンド処理時間
+  # returnCd コマンド処理結果
+
+  # 実行前準備
+  local allArgs="$*"
+  local cmd="${1:-echo}";shift
+  local args=( "$@" )
+  local startTimestamp=$(date +%s%N)
+
+  # 処理
+  local result=$("$cmd" "${args[@]}"; echo "$?")
+
+  # 実行時間計算
+  local endTimestamp=$(date +%s%N)
+  local elapsedTime=$(( $endTimestamp - $startTimestamp ))
+  if [[ ${#elapsedTime} -le 10 ]];then
+    elapsedTime="000000000${elapsedTime}"
+  fi
+  local sec=${elapsedTime:0:-9}
+  local underSec=${elapsedTime:${#elapsedTime}-9:9}
+
+  # 実行時間表示
+  watch.diffTimestamp "${sec}.${underSec}" 0 "${ELAPSED_FORMAT:-'[elapsed %-Ss]'}"
+  return "$result"
+}
+
+watch.diffTimestamp() {
+  # 2つのタイムスタンプ間の差分を計算します
+  # param1 開始タイムスタンプ
+  # param2 終了タイムスタンプ
+  # param3 変換フォーマット
+  # return 差分
+  # returnCd 0:正常終了 1:タイムスタンプが数値以外
+  local fromSec="$1"
+  expr "${fromSec/./}" + 1 >/dev/null 2>&1
+  if [[ ${#fromSec} -eq 0 ]] || [[ $? -ge 2 ]];then
+    return 1
+  fi
+  local toSec="$2"
+  expr "${toSec/./}" + 1 >/dev/null 2>&1
+  if [[ $? -ge 2 ]];then
+    return 1
+  elif [[ ${#fromSec} -eq 0 ]]; then
+    toSec="$fromSec"
+    fromSec=0
+  fi
+  if [[ ${#fromSec} -gt ${#toSec} ]];then
+    local tmpSec="$fromSec"
+    fromSec="$toSec"
+    toSec="$tmpSec"
+  fi
+  local format="${3:-%-Ss}"
+  echo $(date -d "0 ${toSec} sec - ${fromSec} sec" -u +"${format}")
+}
+alias watch.diff='watch.diffTimestamp'
+
+watch.currentTimeSec() {
+  # 秒までを含めたタイムスタンプを取得します
+  # return タイムスタンプ（秒レベル）
+  echo $(date +%s)
+}
+
+watch.currentTimeMillis() {
+  # ミリ秒までを含めたタイムスタンプを取得します
+  # return タイムスタンプ（ミリ秒レベル）
+  echo $(date +%s%3N)
+}
+
+watch.currentTimeNanos() {
+  # ナノ秒までを含めたタイムスタンプを取得します
+  # return タイムスタンプ（ナノ秒レベル）
+  echo $(date +%s%N)
+}
+
+watch.sec2Date() {
+  # 秒レベルのタイムスタンプを日付型に変換します
+  # param1 タイムスタンプ（秒レベル）
+  # param2 日付変換フォーマット
+  # return 変換後日付文字列
+  # returnCd 0:正常終了 1:タイムスタンプが数値ではない
+  watch.nanos2Date "${1}000000000" "$2"
+}
+
+watch.millis2Date() {
+  # ミリ秒レベルのタイムスタンプを日付型に変換します
+  # param1 タイムスタンプ（ミリ秒レベル）
+  # param2 日付変換フォーマット
+  # return 変換後日付文字列
+  # returnCd 0:正常終了 1:タイムスタンプが数値ではない
+  watch.nanos2Date "${1}000000" "$2"
+}
+
+watch.nanos2Date() {
+  # ナノ秒レベルのタイムスタンプを日付型に変換します
+  # param1 タイムスタンプ（ナノ秒レベル）
+  # param2 日付変換フォーマット
+  # return 変換後日付文字列
+  # returnCd 0:正常終了 1:タイムスタンプが数値ではない
+  local timestamp=${1};shift
+  expr "${timestamp}" + 1 >/dev/null 2>&1
+  if [[ $? -ge 2 ]];then
+    return 1
+  fi
+  local millis=000000000
+  if [[ ${#timestamp} -gt 9 ]];then
+    millis=${timestamp:${#timestamp}-9:9}
+    timestamp=${timestamp:0:-9}
+  else
+    timestamp="${millis}${timestamp}"
+    millis=${timestamp:${#timestamp}-9:9}
+    timestamp=0
+  fi
+  local format=${1:-'%Y-%m-%d %H:%M:%S'}
+  echo $(date +"$format" -d @"${timestamp}.${millis}")
+}

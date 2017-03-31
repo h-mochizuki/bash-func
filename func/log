@@ -23,18 +23,18 @@ LINE_SEPARATOR='\n'
 # ----------------
 #     関数定義
 # ----------------
-abortNotice() {
+log.setAbort() {
   # 異常終了時のエラー表示設定
   # param1 エラー表示フラグ(on | off)
   #--
-  # usage) abortNotice [on|off]
+  # usage) log.setAbort [on|off]
   local flg='ON'
   if [ "$#" -gt 0 ];then
     flg=$(echo ${1:-"ON"} | awk '{print toupper($0)}')
   fi
   if [ "_$flg" == "_ON" ];then
     echo "abort notice : on"
-    trap '__abort; exit 1' HUP INT QUIT TERM
+    trap 'log.abort; exit 1' HUP INT QUIT TERM
   else
     trap - HUP
     trap - INT
@@ -44,36 +44,36 @@ abortNotice() {
   fi
 }
 
-__abort() {
+log.abort() {
   # 異常終了時のログ出力
-  __logger 'FATAL' '=================' 1>&2
-  __logger 'FATAL' '==== ABORTED ====' 1>&2
-  __logger 'FATAL' '=================' 1>&2
-  __logger 'FATAL' "An error occurred Exiting..." 1>&2
+  log.logger 'FATAL' '=================' 1>&2
+  log.logger 'FATAL' '==== ABORTED ====' 1>&2
+  log.logger 'FATAL' '=================' 1>&2
+  log.logger 'FATAL' "An error occurred Exiting..." 1>&2
 }
 
-trace() {
+log.setTrace() {
   # トレースログ設定
   # 必要なシェルなどで有効にするとコマンドレベルで実行状況を出力します
   # trapを使用しているため、関数スコープで動作します
   # ※ 通常はこれを使用するよりも 'bash -x command' を使用した方が効果的です
   # param1 トレースフラグ(on | off)
   #--
-  # usage) trace [on|off]
+  # usage) log.setTrace [on|off]
   local flg='ON'
   if [ "$#" -gt 0 ];then
     flg=$(echo ${1:-"ON"} | awk '{print toupper($0)}')
   fi
   if [ "_$flg" == "_ON" ];then
     echo "trace : on"
-    trap '__logger "TRACE" "--exec-> ${BASH_COMMAND[@]//\"/}"' DEBUG
+    trap 'log.logger "TRACE" "--exec-> ${BASH_COMMAND[@]//\"/}"' DEBUG
   else
     trap - DEBUG
     echo "trace : off"
   fi
 }
 
-__logger() {
+log.logger() {
   # ロガー
   # ログテンプレート内のプレイスホルダー"{}"を置換パラメータに置き換えます
   # param1 ログレベル
@@ -81,23 +81,23 @@ __logger() {
   # param3+ 置換パラメータ
   # returnCd 0:正常 9:パラメータエラー
   #--
-  # usage) __logger '[INFO|WARN|ERROR]' '{} is {}.' 'This' 'mine'
+  # usage) log.logger '[INFO|WARN|ERROR]' '{} is {}.' 'This' 'mine'
   if [ "$#" -lt 1 ];then
     errorLog "Illegal palameters exception: You should give log-level and message or more parameters."
     return 9
   fi
-  readonly local level="$1";shift
+  local level="$1";shift
   local message
   if [ "$#" -eq 0 ];then
     message=''
   else
     message=$(echo "$1" | sed -e 's|/|\\/|g');shift
   fi
-  readonly local params=( "$@" )
+  local params=( "$@" )
 
-  readonly local logformat="${LOG_FORMAT}"
-  readonly local linesepalator="${LINE_SEPARATOR}"
-  readonly local datetime=$(date +"${DATETIME_FORMAT}")
+  local logformat="${LOG_FORMAT}"
+  local linesepalator="${LINE_SEPARATOR}"
+  local datetime=$(date +"${DATETIME_FORMAT}")
   local file=$(basename "${BASH_SOURCE[2]}" | sed -e 's|/|\\/|g')
   local line="${BASH_LINENO[1]}"
   local func="${FUNCNAME[2]}"
@@ -116,7 +116,7 @@ __logger() {
   done
 
   # ログ出力
-  readonly local spaces='     '
+  local spaces='     '
   echo -ne "$logformat" | \
     sed -e "s/%datetime/$datetime/g" \
         -e "s/%level/$level${spaces:${#level}}/g" \
@@ -127,33 +127,33 @@ __logger() {
         -e "s/%eol/${linesepalator}/g"
 }
 
-infoLog() {
+log.info() {
   # INFOログ
   # param1 ログテンプレート
   # param2+ 置換パラメータ
-  __logger 'INFO' "$@"
+  log.logger 'INFO' "$@"
 }
 
-warnLog() {
+log.warn() {
   # WARNログ
   # param1 ログテンプレート
   # param2+ 置換パラメータ
-  __logger 'WARN' "$@" 1>&2
+  log.logger 'WARN' "$@" 1>&2
 }
 
-errorLog() {
+log.error() {
   # ERRORログ
   # param1 ログテンプレート
   # param2+ 置換パラメータ
-  __logger 'ERROR' "$@" 1>&2
+  log.logger 'ERROR' "$@" 1>&2
 }
 
-logging() {
+log.to() {
   # ログを出力します
   # input-stream 入力ストリーム
   # param1 ログファイル名（なければデフォルト値）
   # param2+ 対象処理（入力ストリーム優先）
-  readonly local timestamp=$(date +"${TIMESTAMP_FORMAT}")
+  local timestamp=$(date +"${TIMESTAMP_FORMAT}")
   local basefile=$(echo "$0" | sed -e 's/^-*//')
   local logfile=$(echo "$LOG_FILE" | sed -e "s/%timestamp/$timestamp/g" -e "s/%file/$(basename ${basefile%.*})/g")
   if [ "$#" -gt 0 ];then
@@ -167,7 +167,7 @@ logging() {
   if [ "$#" -gt 0 ];then
     cmd="$1";shift
   fi
-  readonly local args=( "$@" )
+  local args=( "$@" )
   dir="$(dirname $logfile)"
   if [ ! -d "$dir" ];then
     echo "'$dir' is not found."

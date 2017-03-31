@@ -136,3 +136,16 @@ str.isNumber() {
   str.isInteger "${arg/./}"
   return "$?"
 }
+
+str.times() {
+  # 文字列を指定回数繰り返します
+  # param1 文字列
+  # param2 指定回数（デフォルト1回）
+  # return 指定回数繰り返された文字列
+  local str=$1;shift
+  local cnt=${1:-1}
+  local i
+  for (( i=0; i<$cnt; i++ ));do
+    echo -n "$str"
+  done
+}

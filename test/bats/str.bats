@@ -206,3 +206,27 @@ setup() {
   echo "output: ${output[@]}"
   [[ "$status" == 0 ]]
 }
+
+@test "str.times : empty" {
+  run str.times
+  echo "status: ${status}"
+  echo "output: ${output[@]}"
+  [[ "$status" == 0 ]]
+  [[ "${output[0]}" == '' ]]
+}
+
+@test "str.times : 1 char 5 times" {
+  run str.times '1' 5
+  echo "status: ${status}"
+  echo "output: ${output[@]}"
+  [[ "$status" == 0 ]]
+  [[ "${output[0]}" == '11111' ]]
+}
+
+@test "str.times : 5 char 5 times" {
+  run str.times '12345' 5
+  echo "status: ${status}"
+  echo "output: ${output[@]}"
+  [[ "$status" == 0 ]]
+  [[ "${output[0]}" == '1234512345123451234512345' ]]
+}

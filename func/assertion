@@ -3,7 +3,7 @@
 #              評価関数定義
 # =====================================
 base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
-source "${base}/logging"
+source "${base}/log"
 
 # ----------------
 #     関数定義
@@ -53,7 +53,7 @@ assert() {
     local cmd="$1";shift
     local args=( "$@" )
     "$cmd" "${args[@]}" || if [ true ]; then
-      __logger 'ERROR' "!!FAILED!! -exec-> $cmd ${args[@]//\"/}"
+      log.logger 'ERROR' "!!FAILED!! -exec-> $cmd ${args[@]//\"/}"
       exit 1
     fi
   fi
@@ -81,7 +81,7 @@ throw() {
   local exitCd="${1}";shift
   if [[ ! -z "${exitCd+x}" ]] && [[ "${exitCd}" -ne 0 ]];then
     if [[ $# -ne 0 ]];then
-      __logger 'ERROR' "$@"
+      log.logger 'ERROR' "$@"
     fi
     exit "${exitCd}"
   fi
