@@ -5,7 +5,7 @@
 
 setup() {
   # テスト対象モジュールの読込み
-  load $BATS_TEST_DIRNAME/../../func/watch
+  load $BATS_TEST_DIRNAME/../../scripts/lib/watch
   ELAPSED_FORMAT='[elapsed %-S sec]'
 }
 

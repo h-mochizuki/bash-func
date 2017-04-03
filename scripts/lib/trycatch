@@ -1,0 +1,45 @@
+#!/bin/bash
+# =====================================
+#               例外定義
+# =====================================
+
+# ----------------
+#     関数定義
+# ----------------
+try() {
+  # catch句にエラーを届けるための前処理を実施します
+  [[ $- = *e* ]]; SAVED_OPT_E=$?
+  set +e
+}
+
+catch() {
+  # エラーが発生したかを後続に返します
+  # 後続処理では次のように処理を始めてください
+  #   catch || { sub-shells }
+  export EXCEPTION_CD=$?
+  (( $SAVED_OPT_E )) && set +e
+  return "${EXCEPTION_CD}"
+}
+
+throw() {
+  # 指定された終了コードで処理を終了します
+  # param1: 終了コード
+  # param2+: エラーログ内容
+  local exitCd="${1}";shift
+  if [[ ! -z "${exitCd+x}" ]] && [[ "${exitCd}" -ne 0 ]];then
+    if [[ $# -ne 0 ]];then
+      log.logger 'ERROR' "$@"
+    fi
+    exit "${exitCd}"
+  fi
+}
+
+throwErrors() {
+  # 以降の処理でエラー時に終了するようにします
+  set -e
+}
+
+ignoreErrors() {
+  # 以降の処理でエラー時にも処理を継続するようにします
+  set +e
+}

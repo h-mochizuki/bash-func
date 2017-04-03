@@ -8,7 +8,7 @@ source "${base}/log"
 # ----------------
 #     関数定義
 # ----------------
-isInstalled() {
+assert.installed() {
   # 指定されたコマンドが実行可能かを返します
   # param1 コマンドやファンクション
   # returnCd 0:実行可能 1:実行不可
@@ -19,16 +19,16 @@ isInstalled() {
   local targetType="$(type -t ${target})"
   if [[ "${targetType}" == "builtin" ]] || [[ "${targetType}" == "function" ]];then
     return 0
-  elif [[ "${targetType}" == "file" ]] && $(isExecutable "$(type -P ${target})");then
+  elif [[ "${targetType}" == "file" ]] && $(assert.executable "$(type -P ${target})");then
     return 0
-  elif [[ "${targetType}" == "alias" ]] && $(isExecutable "$(type -P ${target})");then
+  elif [[ "${targetType}" == "alias" ]] && $(assert.executable "$(type -P ${target})");then
     return 0
   else
     return 1
   fi
 }
 
-isExecutable() {
+assert.executable() {
   # 指定されたファイルが実行可能かを返します
   # param1 ファイルパス
   # returnCd 0:実行可能 1:実行不可
@@ -45,7 +45,7 @@ isExecutable() {
   fi
 }
 
-assert() {
+assert.exec() {
   # 渡されたコマンドを実行して、エラーだった場合には全体の処理を終了します
   # param1+ 実行コマンド
   # exitCd 1:処理エラー
@@ -57,42 +57,4 @@ assert() {
       exit 1
     fi
   fi
-}
-
-try() {
-  # catch句にエラーを届けるための前処理を実施します
-  [[ $- = *e* ]]; SAVED_OPT_E=$?
-  set +e
-}
-
-catch() {
-  # エラーが発生したかを後続に返します
-  # 後続処理では次のように処理を始めてください
-  #   catch || { sub-shells }
-  export EXCEPTION_CD=$?
-  (( $SAVED_OPT_E )) && set +e
-  return "${EXCEPTION_CD}"
-}
-
-throw() {
-  # 指定された終了コードで処理を終了します
-  # param1: 終了コード
-  # param2+: エラーログ内容
-  local exitCd="${1}";shift
-  if [[ ! -z "${exitCd+x}" ]] && [[ "${exitCd}" -ne 0 ]];then
-    if [[ $# -ne 0 ]];then
-      log.logger 'ERROR' "$@"
-    fi
-    exit "${exitCd}"
-  fi
-}
-
-throwErrors() {
-  # 以降の処理でエラー時に終了するようにします
-  set -e
-}
-
-ignoreErrors() {
-  # 以降の処理でエラー時にも処理を継続するようにします
-  set +e
 }

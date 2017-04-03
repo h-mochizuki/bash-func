@@ -4,7 +4,7 @@
 # =====================================
 
 setup() {
-  load $BATS_TEST_DIRNAME/../../func/assertion
+  load $BATS_TEST_DIRNAME/../../scripts/lib/assert
   EXEC_FILE="${BATS_TMPDIR}/execfile"
   touch "${EXEC_FILE}"
   chmod +x "${EXEC_FILE}"
@@ -24,72 +24,72 @@ teardown() {
   fi
 }
 
-@test "isExecutable : empty" {
-  run isExecutable
+@test "assert.installed : function" {
+  run assert.installed assert.installed
+  echo "status: ${status}"
+  echo "output: ${output[@]}"
+  [[ "$status" == 0 ]]
+}
+
+@test "assert.installed : builtin" {
+  run assert.installed type
+  echo "status: ${status}"
+  echo "output: ${output[@]}"
+  [[ "$status" == 0 ]]
+}
+
+@test "assert.installed : file" {
+  run assert.installed wget
+  echo "status: ${status}"
+  echo "output: ${output[@]}"
+  [[ "$status" == 0 ]]
+}
+
+@test "assert.installed : alias" {
+  run assert.installed ls
+  echo "status: ${status}"
+  echo "output: ${output[@]}"
+  [[ "$status" == 0 ]]
+}
+
+@test "assert.installed : not defined" {
+  run assert.installed notdefinedcommand
   echo "status: ${status}"
   echo "output: ${output[@]}"
   [[ "$status" == 1 ]]
 }
 
-@test "isExecutable : executable" {
-  run isExecutable "${EXEC_FILE}"
-  echo "status: ${status}"
-  echo "output: ${output[@]}"
-  [[ "$status" == 0 ]]
-}
-
-@test "isExecutable : not executable" {
-  run isExecutable "${NOTEXEC_FILE}"
+@test "assert.executable : empty" {
+  run assert.executable
   echo "status: ${status}"
   echo "output: ${output[@]}"
   [[ "$status" == 1 ]]
 }
 
-@test "isInstalled : function" {
-  run isInstalled isInstalled
+@test "assert.executable : executable" {
+  run assert.executable "${EXEC_FILE}"
   echo "status: ${status}"
   echo "output: ${output[@]}"
   [[ "$status" == 0 ]]
 }
 
-@test "isInstalled : builtin" {
-  run isInstalled type
-  echo "status: ${status}"
-  echo "output: ${output[@]}"
-  [[ "$status" == 0 ]]
-}
-
-@test "isInstalled : file" {
-  run isInstalled wget
-  echo "status: ${status}"
-  echo "output: ${output[@]}"
-  [[ "$status" == 0 ]]
-}
-
-@test "isInstalled : alias" {
-  run isInstalled ls
-  echo "status: ${status}"
-  echo "output: ${output[@]}"
-  [[ "$status" == 0 ]]
-}
-
-@test "isInstalled : not defined" {
-  run isInstalled notdefinedcommand
+@test "assert.executable : not executable" {
+  run assert.executable "${NOTEXEC_FILE}"
   echo "status: ${status}"
   echo "output: ${output[@]}"
   [[ "$status" == 1 ]]
 }
 
-@test "assert : success" {
-  run assert true
+@test "assert.exec : success" {
+  run assert.exec true
   echo "status: ${status}"
   echo "output: ${output[@]}"
   [[ "$status" == 0 ]]
   [[ "${#output[0]}" == 0 ]]
 }
 
-@test "assert : failure" {
-  run assert false
+@test "assert.exec : failure" {
+  run assert.exec false
   echo "status: ${status}"
   echo "output: ${output[@]}"
   [[ "$status" == 1 ]]
