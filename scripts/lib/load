@@ -27,4 +27,3 @@ load.sourceDir() {
     fi
   done
 }
-alias load='load.sourceDir'

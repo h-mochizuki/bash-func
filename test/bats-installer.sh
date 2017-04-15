@@ -5,6 +5,7 @@
 BASE="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
 DOWNLOAD_DIR_NAME="bats-module"
 INSTALL_DIR="/usr/local"
+DOWNLOAD_URL='https://github.com/sstephenson/bats.git'
 
 function __log() {
   echo "[$(date +'%Y-%m-%d %H:%M:%s')]$*"
@@ -46,7 +47,7 @@ function install() {
   echo;
   infoLog "Batsモジュールを取得します"
   cd "${BASE}"
-  git clone https://github.com/sstephenson/bats.git ${DOWNLOAD_DIR_NAME}
+  git clone "${DOWNLOAD_URL" ${DOWNLOAD_DIR_NAME}
   infoLog "最新のBatsモジュールを取得しました"
   cd "${DOWNLOAD_DIR}"
   ${DOWNLOAD_DIR}/install.sh "${INSTALL_DIR}"

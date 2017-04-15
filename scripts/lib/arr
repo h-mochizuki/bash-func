@@ -71,3 +71,43 @@ arr.last() {
     echo "${args[$size-1]}"
   fi
 }
+
+arr.take() {
+  # 配列から指定された要素数だけ返します
+  # 指定数よりも要素が少ない場合は、あるだけを返します
+  # param1 指定要素数
+  # param2+ 配列要素
+  # return 指定された数分の要素
+  # returnCd 0:正常 1:指定要素数が不正
+  local limit="$1";shift
+  expr "${limit}" + 1 >/dev/null 2>&1
+  if [ $? -ge 2 ]; then
+    return 1
+  fi
+  local args=( "$@" )
+  local size=${#args[@]}
+  if [[ "$size" -lt "$limit" ]];then
+    echo "${args[@]}"
+  else
+    echo "${args[@]:0:$limit}"
+  fi
+}
+
+arr.drop() {
+  # 配列から指定された要素数だけ除外して返します
+  # 指定数よりも要素が少ない場合は、空を返します
+  # param1 指定要素数
+  # param2+ 配列要素
+  # return 指定された数分除外した要素
+  # returnCd 0:正常 1:指定要素数が不正
+  local size="$1";shift
+  expr "${size}" + 1 >/dev/null 2>&1
+  if [ $? -ge 2 ]; then
+    return 1
+  fi
+  local args=( "$@" )
+  local limit=${#args[@]}
+  if [[ "$size" -lt "$limit" ]];then
+    echo "${args[@]:$size:$limit-1}"
+  fi
+}
