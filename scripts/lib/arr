@@ -52,6 +52,7 @@ arr.car() {
   # return 配列の先頭要素
   echo "$1"
 }
+alias arr.head='arr.car'
 
 arr.cdr() {
   # 配列の先頭以降を返します
@@ -60,6 +61,7 @@ arr.cdr() {
   shift
   echo "$@"
 }
+alias arr.head='arr.tail'
 
 arr.last() {
   # 配列の最後の要素を返します

@@ -16,10 +16,10 @@ setup() {
 }
 
 teardown() {
-  if [[ ! -z "${EXEC_FILE+x}" ]];then
+  if [ ! -z "${EXEC_FILE+x}" ];then
     rm -f "${EXEC_FILE}"
   fi
-  if [[ ! -z "${NOTEXEC_FILE+x}" ]];then
+  if [ ! -z "${NOTEXEC_FILE+x}" ];then
     rm -f touch "${NOTEXEC_FILE}"
   fi
 }
@@ -27,71 +27,71 @@ teardown() {
 @test "assert.installed : function" {
   run assert.installed assert.installed
   echo "status: ${status}"
-  echo "output: ${output[@]}"
-  [[ "$status" == 0 ]]
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
 }
 
 @test "assert.installed : builtin" {
   run assert.installed type
   echo "status: ${status}"
-  echo "output: ${output[@]}"
-  [[ "$status" == 0 ]]
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
 }
 
 @test "assert.installed : file" {
   run assert.installed wget
   echo "status: ${status}"
-  echo "output: ${output[@]}"
-  [[ "$status" == 0 ]]
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
 }
 
 @test "assert.installed : alias" {
   run assert.installed ls
   echo "status: ${status}"
-  echo "output: ${output[@]}"
-  [[ "$status" == 0 ]]
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
 }
 
 @test "assert.installed : not defined" {
   run assert.installed notdefinedcommand
   echo "status: ${status}"
-  echo "output: ${output[@]}"
-  [[ "$status" == 1 ]]
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
 }
 
 @test "assert.executable : empty" {
   run assert.executable
   echo "status: ${status}"
-  echo "output: ${output[@]}"
-  [[ "$status" == 1 ]]
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
 }
 
 @test "assert.executable : executable" {
   run assert.executable "${EXEC_FILE}"
   echo "status: ${status}"
-  echo "output: ${output[@]}"
-  [[ "$status" == 0 ]]
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
 }
 
 @test "assert.executable : not executable" {
   run assert.executable "${NOTEXEC_FILE}"
   echo "status: ${status}"
-  echo "output: ${output[@]}"
-  [[ "$status" == 1 ]]
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
 }
 
 @test "assert.exec : success" {
   run assert.exec true
   echo "status: ${status}"
-  echo "output: ${output[@]}"
-  [[ "$status" == 0 ]]
-  [[ "${#output[0]}" == 0 ]]
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${#output}" == 0 ]
 }
 
 @test "assert.exec : failure" {
   run assert.exec false
   echo "status: ${status}"
-  echo "output: ${output[@]}"
-  [[ "$status" == 1 ]]
-  [[ "${output[0]}" == '[ERROR]!!FAILED!! -exec-> false ' ]]
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+  [ "${output}" == '[ERROR]!!FAILED!! -exec-> false ' ]
 }

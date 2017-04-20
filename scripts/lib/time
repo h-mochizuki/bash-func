@@ -1,19 +1,19 @@
 #!/bin/bash
 # =====================================
-#            計測関係関数定義
+#            時間関係関数定義
 # =====================================
 
 # ----------------
 #     初期設定
 # ----------------
 # ※ 上書きしたい場合は、このファイルを読み込んだ後で実施してください
-# コマンド処理時間計測フォーマット
+# コマンド処理時間計測フォーマット（date 関数で使用可能なフォーマット）
 ELAPSED_FORMAT='[elapsed %-S sec]'
 
 # ----------------
 #     関数定義
 # ----------------
-watch.elapsed() {
+time.elapsed() {
   # コマンド処理時間計測を実施します
   # param1 コマンド
   # param2+ コマンドパラメータ
@@ -39,11 +39,11 @@ watch.elapsed() {
   local underSec=${elapsedTime:${#elapsedTime}-9:9}
 
   # 実行時間表示
-  watch.diffTimestamp "${sec}.${underSec}" 0 "${ELAPSED_FORMAT:-'[elapsed %-Ss]'}"
+  time.diffTimestamp "${sec}.${underSec}" 0 "${ELAPSED_FORMAT:-'[elapsed %-Ss]'}"
   return "$result"
 }
 
-watch.diffTimestamp() {
+time.diffTimestamp() {
   # 2つのタイムスタンプ間の差分を計算します
   # param1 開始タイムスタンプ
   # param2 終了タイムスタンプ
@@ -71,45 +71,45 @@ watch.diffTimestamp() {
   local format="${3:-%-Ss}"
   echo $(date -d "0 ${toSec} sec - ${fromSec} sec" -u +"${format}")
 }
-alias watch.diff='watch.diffTimestamp'
+alias time.diff='time.diffTimestamp'
 
-watch.currentTimeSec() {
+time.currentTimeSec() {
   # 秒までを含めたタイムスタンプを取得します
   # return タイムスタンプ（秒レベル）
   echo $(date +%s)
 }
 
-watch.currentTimeMillis() {
+time.currentTimeMillis() {
   # ミリ秒までを含めたタイムスタンプを取得します
   # return タイムスタンプ（ミリ秒レベル）
   echo $(date +%s%3N)
 }
 
-watch.currentTimeNanos() {
+time.currentTimeNanos() {
   # ナノ秒までを含めたタイムスタンプを取得します
   # return タイムスタンプ（ナノ秒レベル）
   echo $(date +%s%N)
 }
 
-watch.sec2Date() {
+time.sec2Date() {
   # 秒レベルのタイムスタンプを日付型に変換します
   # param1 タイムスタンプ（秒レベル）
   # param2 日付変換フォーマット
   # return 変換後日付文字列
   # returnCd 0:正常終了 1:タイムスタンプが数値ではない
-  watch.nanos2Date "${1}000000000" "$2"
+  time.nanos2Date "${1}000000000" "$2"
 }
 
-watch.millis2Date() {
+time.millis2Date() {
   # ミリ秒レベルのタイムスタンプを日付型に変換します
   # param1 タイムスタンプ（ミリ秒レベル）
   # param2 日付変換フォーマット
   # return 変換後日付文字列
   # returnCd 0:正常終了 1:タイムスタンプが数値ではない
-  watch.nanos2Date "${1}000000" "$2"
+  time.nanos2Date "${1}000000" "$2"
 }
 
-watch.nanos2Date() {
+time.nanos2Date() {
   # ナノ秒レベルのタイムスタンプを日付型に変換します
   # param1 タイムスタンプ（ナノ秒レベル）
   # param2 日付変換フォーマット
@@ -132,3 +132,5 @@ watch.nanos2Date() {
   local format=${1:-'%Y-%m-%d %H:%M:%S'}
   echo $(date +"$format" -d @"${timestamp}.${millis}")
 }
+
+alias time.timeout='timeout'

@@ -11,11 +11,19 @@
 LOG_DIR=
 # ログファイル
 LOG_FILE='%file_%timestamp.log'
-# タイムスタンプフォーマット
+# タイムスタンプフォーマット（date 関数で使用可能なフォーマット）
 TIMESTAMP_FORMAT='%Y%m%d'
 # ログフォーマット
+# 利用可能変数
+#   %datetime : TIMESTAMP_FORMAT による日付で置換される
+#   %level : ログレベルで置換される
+#   %file : 対象ファイルで置換される
+#   %func : 対象の関数名で置換される
+#   %line : 行番号で置換される
+#   %msg : メッセージが置換される
+#   %eol : LINE_SEPARATOR による改行コードで置換される
 LOG_FORMAT='[%datetime][%level][%file#%func:%line]:%msg%eol'
-# 日時フォーマット
+# 日時フォーマット（date 関数で使用可能なフォーマット）
 DATETIME_FORMAT='%Y-%m-%d %H:%M:%S'
 # 改行コード
 LINE_SEPARATOR='\n'
@@ -197,7 +205,7 @@ log.watch() {
   # ログを監視します
   # param1 ログファイル名
   # param2 検知パターン
-  # param3+ 処理したい内容（行内容がStreamで渡されます）
+  # param3+ 検知時に処理したい内容（行内容がStreamで渡されます）
   local logfile=$(echo "$1" | sed -e 's|/|\\/|g');shift
   [[ ! -f "$logfile" ]] && touch "$logfile"
   local pattern="$1";shift
@@ -208,6 +216,7 @@ log.watch() {
   tail -n 0 --follow=name --retry "$logfile" | while read l;do
     if echo "$l" | grep -q -e "$pattern";then
       for act in "${actions[@]}";do
+        echo "act : $act"
         echo "$l" | $act
       done
     fi
