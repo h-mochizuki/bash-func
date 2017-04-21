@@ -47,7 +47,7 @@ function install() {
   echo;
   infoLog "Batsモジュールを取得します"
   cd "${BASE}"
-  git clone "${DOWNLOAD_URL" ${DOWNLOAD_DIR_NAME}
+  git clone "${DOWNLOAD_URL}" ${DOWNLOAD_DIR_NAME}
   infoLog "最新のBatsモジュールを取得しました"
   cd "${DOWNLOAD_DIR}"
   ${DOWNLOAD_DIR}/install.sh "${INSTALL_DIR}"
