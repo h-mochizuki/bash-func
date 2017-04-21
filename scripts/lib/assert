@@ -8,6 +8,17 @@ source "${base}/log"
 # ----------------
 #     関数定義
 # ----------------
+assert.isRoot() {
+  # root権限を持つかを返します
+  # returnCd 0:root権限を持つ 1:root権限を持たない
+  if [ ${EUID:-$UID} -eq 0 ];then
+    # superuser
+    return 0
+  else
+    return 1
+  fi
+}
+
 assert.installed() {
   # 指定されたコマンドが実行可能かを返します
   # param1 コマンドやファンクション
