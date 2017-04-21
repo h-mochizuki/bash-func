@@ -8,6 +8,10 @@ source "${base}/log"
 # ----------------
 #     関数定義
 # ----------------
+assert.isRoot() {
+  [[ ! ${EUID:-$UID} -eq 0 ]] && return 1
+}
+
 assert.installed() {
   # 指定されたコマンドが実行可能かを返します
   # param1 コマンドやファンクション
