@@ -8,10 +8,34 @@ base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
 #     関数定義
 # ----------------
 load() {
-  local targetDir="${1:-$(cd ${base};pwd)}"
+  # 指定されたディレクトリ以下のファイルを source で読み込みます
+  # param1 ディレクトリパス（デフォルト：カレントディレクトリ）
+  local targetDir="$(cd ${1:-$base};pwd)"
   if [ -d "${targetDir}" ]; then
     for f in $(find "${targetDir}" -maxdepth 1 -type f | awk '{ print $NF }');do
-      [[ ! $(basename "${BASH_SOURCE:-0}") == $(basename "$f") ]] && source "$f"
+      [[ ! "$base/$(basename ${BASH_SOURCE:-$0})" == "$f" ]] && source "$f"
     done
   fi
 }
+
+show-def() {
+  # 指定された関数の定義を表示します
+  # このディレクトリに定義された関数以外は type コマンドの結果を返します
+  # param1 関数名
+  if [[ "$#" -eq 0 ]];then
+    echo "usage: show-def <funcname>" 1>&2
+    return 1
+  fi
+  if [[ $(cat "${BASH_SOURCE:-$0}" | grep -e "^${1}.*(" | wc -l) -ne 0 ]];then
+    cat "${BASH_SOURCE:-$0}" | sed -n -e "/^${1}.*{/,/^}/p"
+  else
+    if [[ "$(type -t $1)" == "function" ]] && [[ -f "$base/${1%.*}" ]];then
+      cat "$base/${1%.*}" | sed -n -e "/^${1}.*{/,/^}/p"
+    else
+      type "$1"
+    fi
+  fi
+}
+
+# このライブラリを読み込みます
+load
