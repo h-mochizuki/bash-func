@@ -133,4 +133,11 @@ time.nanos2Date() {
   echo $(date +"$format" -d @"${timestamp}.${millis}")
 }
 
-alias time.timeout='timeout'
+time.timeout() {
+  # 指定秒数までに処理が終わらなかったらエラー終了します
+  # param1 指定秒数
+  # param2+ 実行したい処理（bash -c 'do somethings'が便利）
+  # return 実行結果
+  # returnCd 0:正常終了 124:タイムアウト
+  timeout "$@"
+}

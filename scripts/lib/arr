@@ -44,7 +44,14 @@ arr.hasElement() {
   done
   return 1
 }
-alias arr.contains='arr.hasElement'
+
+arr.contains() {
+  # 指定された要素が配列に含まれるかを返します
+  # param1 指定要素
+  # param2+ 配列要素
+  # returnCd 0:含まれる 1:含まれない
+  arr.hasElement "$@"
+}
 
 arr.car() {
   # 配列の先頭を返します
@@ -52,7 +59,13 @@ arr.car() {
   # return 配列の先頭要素
   echo "$1"
 }
-alias arr.head='arr.car'
+
+arr.head() {
+  # 配列の先頭を返します
+  # param1+ 配列要素
+  # return 配列の先頭要素
+  arr.car "$@"
+}
 
 arr.cdr() {
   # 配列の先頭以降を返します
@@ -61,7 +74,13 @@ arr.cdr() {
   shift
   echo "$@"
 }
-alias arr.head='arr.tail'
+
+arr.tail() {
+  # 配列の先頭以降を返します
+  # param1+ 配列要素
+  # return 配列の先頭以降の要素
+  arr.cdr "$@"
+}
 
 arr.last() {
   # 配列の最後の要素を返します

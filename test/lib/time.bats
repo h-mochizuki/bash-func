@@ -100,3 +100,19 @@ setup() {
   [ "$status" -eq 0 ]
   [ "${output}" == "$TEST_DATE" ]
 }
+
+@test "time.timeout : in time " {
+  run time.timeout 3s bash -c 'sleep 1s; echo "hoge"'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'hoge' ]
+}
+
+@test "time.timeout : over time " {
+  run time.timeout 3s bash -c 'sleep 5s; echo "hoge"'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 124 ]
+  [ "${output}" == '' ]
+}

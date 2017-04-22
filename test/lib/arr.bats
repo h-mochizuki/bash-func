@@ -54,6 +54,20 @@ setup() {
   [ "$status" -eq 0 ]
 }
 
+@test "arr.contains : not exists" {
+  run arr.contains "ZERO" "${TEST_ARRAY[@]}"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+}
+
+@test "arr.contains : exists" {
+  run arr.contains "ONE" "${TEST_ARRAY[@]}"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+}
+
 @test "arr.car : empy" {
   run arr.car
   echo "status: ${status}"
@@ -78,6 +92,30 @@ setup() {
   [ "${output}" == "ONE" ]
 }
 
+@test "arr.head : empy" {
+  run arr.head
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "" ]
+}
+
+@test "arr.head : has 1 element" {
+  run arr.head "ONE"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "ONE" ]
+}
+
+@test "arr.head : has more element" {
+  run arr.head "ONE" "TWO" "THREE"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "ONE" ]
+}
+
 @test "arr.cdr : empy" {
   run arr.cdr
   echo "status: ${status}"
@@ -95,6 +133,30 @@ setup() {
 }
 
 @test "arr.cdr : has more element" {
+  run arr.cdr "ONE" "TWO" "THREE"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "TWO THREE" ]
+}
+
+@test "arr.tail : empy" {
+  run arr.cdr
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "" ]
+}
+
+@test "arr.tail : has 1 element" {
+  run arr.cdr "ONE"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "" ]
+}
+
+@test "arr.tail : has more element" {
   run arr.cdr "ONE" "TWO" "THREE"
   echo "status: ${status}"
   echo "output: ${output}"

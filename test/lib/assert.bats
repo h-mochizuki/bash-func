@@ -25,6 +25,7 @@ teardown() {
 }
 
 @test "assert.isRoot : root" {
+  assert.isWindows && skip "Windowsなのでテストをスキップします"
   run assert.isRoot root
   echo "status: ${status}"
   echo "output: ${output}"
@@ -36,6 +37,13 @@ teardown() {
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 1 ]
+}
+
+@test "assert.isWindows : cygwin" {
+  run assert.isWindows
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
 }
 
 @test "assert.installed : function" {
