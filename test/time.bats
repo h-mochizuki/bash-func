@@ -5,7 +5,7 @@
 
 setup() {
   # テスト対象モジュールの読込み
-  load $BATS_TEST_DIRNAME/../../scripts/lib/time
+  load $BATS_TEST_DIRNAME/../lib/time
   ELAPSED_FORMAT='[elapsed %-S sec]'
 }
 
@@ -102,7 +102,7 @@ setup() {
 }
 
 @test "time.timeout : in time " {
-  run time.timeout 3s bash -c 'sleep 1s; echo "hoge"'
+  run time.timeout 1s bash -c 'echo "hoge"'
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
@@ -110,7 +110,7 @@ setup() {
 }
 
 @test "time.timeout : out of time " {
-  run time.timeout 3s bash -c 'sleep 5s; echo "hoge"'
+  run time.timeout 1s bash -c 'sleep 3s; echo "hoge"'
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 124 ]

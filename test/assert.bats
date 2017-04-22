@@ -4,7 +4,7 @@
 # =====================================
 
 setup() {
-  load $BATS_TEST_DIRNAME/../../scripts/lib/assert
+  load $BATS_TEST_DIRNAME/../lib/assert
   EXEC_FILE="${BATS_TMPDIR}/execfile"
   touch "${EXEC_FILE}"
   chmod +x "${EXEC_FILE}"
@@ -37,13 +37,6 @@ teardown() {
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 1 ]
-}
-
-@test "assert.isWindows : cygwin" {
-  run assert.isWindows
-  echo "status: ${status}"
-  echo "output: ${output}"
-  [ "$status" -eq 0 ]
 }
 
 @test "assert.installed : function" {

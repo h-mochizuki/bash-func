@@ -5,7 +5,7 @@
 
 setup() {
   # テスト対象モジュールの読込み
-  load $BATS_TEST_DIRNAME/../../scripts/lib/log
+  load $BATS_TEST_DIRNAME/../lib/log
   # テスト用にフォーマットを変更
   LOG_FORMAT='[%level]%msg'
 }

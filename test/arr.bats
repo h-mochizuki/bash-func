@@ -4,7 +4,7 @@
 # =====================================
 
 setup() {
-  load $BATS_TEST_DIRNAME/../../scripts/lib/arr
+  load $BATS_TEST_DIRNAME/../lib/arr
   TEST_ARRAY=( "ONE" "TWO" "THREE" )
 }
 
