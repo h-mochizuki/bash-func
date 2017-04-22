@@ -1,29 +1,17 @@
 #!/bin/bash
 # =====================================
-#           読込み関数定義
+#            一括読み込み関数定義
 # =====================================
 base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
 
 # ----------------
 #     関数定義
 # ----------------
-load.sourceDir() {
-  # 指定されたディレクトリの要素を読み込みます
-  # param1 ディレクトリパス
-
-  local dirpath=$(cd "${1:-$(pwd)}"; pwd)
-  if  [[ ! -d "$dirpath" ]];then
-    echo "Illegal Arguments Error : '${dirpath}' is not Directory." >&2
-    return 1
+load() {
+  local targetDir="${1:-$(cd "$base";pwd)}"
+  if [ -d "${targetDir}" ]; then
+    for f in $(find "${targetDir}" -maxdepth 1 -type f | awk '{ print $NF }');do
+      [[ ! $(basename "${BASH_SOURCE:-0}") == $(basename "$f") ]] && source "$f"
+    done
   fi
-  local f
-  for f in $(find "$dirpath" -maxdepth 1);do
-    if [[ -f "$f" ]];then
-       source "$f"
-       if [[ $? -ne 0 ]];then
-         echo "LoadFailedError : '$f'" >&2
-         return 1
-       fi
-    fi
-  done
 }

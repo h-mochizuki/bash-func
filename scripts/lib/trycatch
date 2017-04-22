@@ -56,7 +56,6 @@ try() {
   # (
   #   echo "do something"
   # )
-  )
   [[ $- = *e* ]]; SAVED_OPT_E=$?
   set +e
 }
