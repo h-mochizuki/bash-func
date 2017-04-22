@@ -107,6 +107,28 @@ str.toUpper() {
   fi
 }
 
+str.toLf() {
+  # 改行コードを CRLF -> LF 変換します
+  # param1+ ファイル名
+  # return 改行コードを LF に変換した文字列
+  if [ -t 0 ]; then
+    [[ "$#" -ne 0 ]] &&  cat "$@" | tr -d \\r
+  else
+    cat - | tr -d \\r
+  fi
+}
+
+str.toCrLf() {
+  # 改行コードを LF -> CRLF 変換します
+  # param1+ ファイル名
+  # return 改行コードを LF に変換した文字列
+  if [ -t 0 ]; then
+    [[ "$#" -ne 0 ]] &&  cat "$@" | str.toLf | sed 's/$/\r/g'
+  else
+    cat - | str.toLf | sed 's/$/\r/g'
+  fi
+}
+
 str.isInteger() {
   # 入力文字列が整数かどうかを返します
   # param1 入力文字列
