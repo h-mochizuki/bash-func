@@ -32,9 +32,7 @@ assert.installed() {
   # 指定されたコマンドが実行可能かを返します
   # param1 コマンドやファンクション
   # returnCd 0:実行可能 1:実行不可
-  if [ "$#" -eq 0 ];then
-    return 1
-  fi
+  [[ "$#" -eq 0 ]] && return 1
   local target="$1"
   local targetType="$(type -t ${target})"
   if [[ "${targetType}" == "builtin" ]] || [[ "${targetType}" == "function" ]];then
@@ -52,33 +50,24 @@ assert.executable() {
   # 指定されたファイルが実行可能かを返します
   # param1 ファイルパス
   # returnCd 0:実行可能 1:実行不可
-  if [ "$#" -eq 0 ];then
-    return 1
-  fi
-  local target="$1"
-  [[ ! -z "${target+x}" ]] && [[ -x "${target}" ]]
+  [[ "$#" -eq 0 ]] && return 1
+  [[ ! -z "${1+x}" ]] && [[ -x "${1}" ]]
 }
 
 assert.writable() {
   # 指定されたファイルが書込可能かを返します
   # param1 ファイルパス
   # returnCd 0:書込可能 1:書込不可
-  if [ "$#" -eq 0 ];then
-    return 1
-  fi
-  local target="$1"
-  [[ ! -z "${target+x}" ]] && [[ -w "${target}" ]]
+  [[ "$#" -eq 0 ]] && return 1
+  [[ ! -z "${1+x}" ]] && [[ -w "${1}" ]]
 }
 
 assert.readable() {
   # 指定されたファイルが読込可能かを返します
   # param1 ファイルパス
   # returnCd 0:読込可能 1:読込不可
-  if [ "$#" -eq 0 ];then
-    return 1
-  fi
-  local target="$1"
-  [[ ! -z "${target+x}" ]] && [[ -r "${target}" ]]
+  [[ "$#" -eq 0 ]] && return 1
+  [[ ! -z "${1+x}" ]] && [[ -r "${1}" ]]
 }
 
 assert.exec() {

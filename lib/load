@@ -8,7 +8,7 @@ base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
 #     関数定義
 # ----------------
 load() {
-  local targetDir="${1:-$(cd "$base";pwd)}"
+  local targetDir="${1:-$(cd ${base};pwd)}"
   if [ -d "${targetDir}" ]; then
     for f in $(find "${targetDir}" -maxdepth 1 -type f | awk '{ print $NF }');do
       [[ ! $(basename "${BASH_SOURCE:-0}") == $(basename "$f") ]] && source "$f"

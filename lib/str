@@ -87,27 +87,23 @@ str.match() {
 
 str.toLower() {
   # 入力文字列を小文字に変換します
-  # param1 文字列
+  # param1+ 文字列
   # return 小文字に変換した文字列
   if [ -t 0 ]; then
-    if [[ "$#" -gt 0 ]];then
-      echo "$1" | awk '{print tolower($0)}'
-    fi
+    [[ "$#" -ne 0 ]] &&  echo "$@" | tr '[:upper:]' '[:lower:]'
   else
-    cat - | awk '{print tolower($0)}'
+    cat - | tr '[:upper:]' '[:lower:]'
   fi
 }
 
 str.toUpper() {
   # 入力文字列を大文字に変換します
-  # param1 文字列
+  # param1+ 文字列
   # return 大文字に変換した文字列
   if [ -t 0 ]; then
-    if [[ "$#" -gt 0 ]];then
-      echo "$1" | awk '{print toupper($0)}'
-    fi
+    [[ "$#" -ne 0 ]] &&  echo "$@" | tr '[:lower:]' '[:upper:]'
   else
-    cat - | awk '{print toupper($0)}'
+    cat - | tr '[:lower:]' '[:upper:]'
   fi
 }
 
@@ -115,9 +111,7 @@ str.isInteger() {
   # 入力文字列が整数かどうかを返します
   # param1 入力文字列
   # returnCd 0:整数 1:整数ではない
-  if [[ "$#" -eq 0 ]];then
-    return 1
-  fi
+  [[ "$#" -eq 0 ]] && return 1
   local arg="$1"
   expr "${arg}" + 1 >/dev/null 2>&1
   if [ $? -ge 2 ]; then
@@ -129,9 +123,7 @@ str.isNumber() {
   # 小数の場合も考慮し、入力文字列が数値かどうかを返します
   # param1 入力文字列
   # returnCd 0:数値 1:数値ではない
-  if [[ "$#" -eq 0 ]];then
-    return 1
-  fi
+  [[ "$#" -eq 0 ]] && return 1
   local arg="$1"
   str.isInteger "${arg/./}"
   return "$?"
@@ -142,10 +134,7 @@ str.times() {
   # param1 文字列
   # param2 指定回数（デフォルト1回）
   # return 指定回数繰り返された文字列
-  local str=$1;shift
+  local str=${1:-''};shift
   local cnt=${1:-1}
-  local i
-  for (( i=0; i<$cnt; i++ ));do
-    echo -n "$str"
-  done
+  eval "printf '${str}%.0s' {1..${cnt}}"
 }
