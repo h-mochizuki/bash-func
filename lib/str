@@ -79,53 +79,48 @@ str.match() {
   return 1
 }
 
-str.toLower() {
-  # 入力文字列を小文字に変換します
-  # param1+ 文字列
-  # return 小文字に変換した文字列
-  # if [ -t 0 ]; then
-  #   [[ "$#" -ne 0 ]] &&  echo "$@" | tr '[:upper:]' '[:lower:]'
-  # else
-  #   cat - | tr '[:upper:]' '[:lower:]'
-  # fi
+str.stream() {
+  # 入力引数、もしくは入力ストリームをストリームとして返します
+  # input-stream 入力ストリーム
+  # param1+ 入力引数
+  # return ストリーム
   if [ -t 0 ]; then
     [[ "$#" -ne 0 ]] &&  echo "$@"
   else
     cat -
-  fi | tr '[:upper:]' '[:lower:]'
+  fi
+}
+
+str.toLower() {
+  # 入力文字列、もしくは入力ストリームを小文字に変換します
+  # input-stream 入力ストリーム
+  # param1+ 文字列
+  # return 小文字に変換した文字列
+  str.stream "$@" | tr '[:upper:]' '[:lower:]'
 }
 
 str.toUpper() {
-  # 入力文字列を大文字に変換します
+  # 入力文字列、もしくは入力ストリームを大文字に変換します
+  # input-stream 入力ストリーム
   # param1+ 文字列
   # return 大文字に変換した文字列
-  if [ -t 0 ]; then
-    [[ "$#" -ne 0 ]] &&  echo "$@"
-  else
-    cat -
-  fi | tr '[:lower:]' '[:upper:]'
+  str.stream "$@" | tr '[:lower:]' '[:upper:]'
 }
 
 str.toLf() {
   # 改行コードを CRLF -> LF 変換します
+  # input-stream 入力ストリーム
   # param1+ ファイル名
   # return 改行コードを LF に変換した文字列
-  if [ -t 0 ]; then
-    [[ "$#" -ne 0 ]] &&  cat "$@"
-  else
-    cat -
-  fi | tr -d \\r
+  str.stream "$@" | tr -d \\r
 }
 
 str.toCrLf() {
   # 改行コードを LF -> CRLF 変換します
+  # input-stream 入力ストリーム
   # param1+ ファイル名
   # return 改行コードを LF に変換した文字列
-  if [ -t 0 ]; then
-    [[ "$#" -ne 0 ]] &&  cat "$@"
-  else
-    cat -
-  fi | str.toLf | sed 's/$/\r/g'
+  str.stream "$@" | str.toLf | sed 's/$/\r/g'
 }
 
 str.isInteger() {
