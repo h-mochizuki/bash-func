@@ -10,13 +10,9 @@ source "${base}/log"
 # ----------------
 assert.isRoot() {
   # root権限を持つかを返します
+  # param1? ユーザ名
   # returnCd 0:root権限を持つ 1:root権限を持たない
-  if [ ${EUID:-$UID} -eq 0 ];then
-    # superuser
-    return 0
-  else
-    return 1
-  fi
+  [ "$(id -u ${1:-$(whoami)})" == "0" ]
 }
 
 assert.installed() {
@@ -47,13 +43,7 @@ assert.executable() {
     return 1
   fi
   local target="$1"
-  if [[ -z "${target+x}" ]];then
-    return 1
-  elif [[ -x "${target}" ]];then
-    return 0
-  else
-    return 1
-  fi
+  [[ ! -z "${target+x}" ]] && [[ -x "${target}" ]]
 }
 
 assert.exec() {

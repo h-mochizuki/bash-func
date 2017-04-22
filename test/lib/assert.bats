@@ -24,6 +24,20 @@ teardown() {
   fi
 }
 
+@test "assert.isRoot : root" {
+  run assert.isRoot root
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+}
+
+@test "assert.isRoot : other" {
+  run assert.isRoot other
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+}
+
 @test "assert.installed : function" {
   run assert.installed assert.installed
   echo "status: ${status}"
