@@ -32,9 +32,7 @@ str.indexOf() {
     idx=$(cat - | awk '{ print index($0, "'"${target}"'")-1}')
   fi
   echo "$idx"
-  if [[ "$idx" == "-1" ]];then
-    return 1
-  fi
+  [[ ! "$idx" == "-1" ]]
 }
 
 str.contains() {
@@ -61,11 +59,7 @@ str.contains() {
     fi
     index=$(cat - | awk '{ print index($0, "'"${target}"'")}')
   fi
-  if [[ "$index" == "0" ]];then
-    return 1
-  else
-    return 0
-  fi
+  [[ ! "$index" == "0" ]]
 }
 
 str.match() {
@@ -89,11 +83,16 @@ str.toLower() {
   # 入力文字列を小文字に変換します
   # param1+ 文字列
   # return 小文字に変換した文字列
+  # if [ -t 0 ]; then
+  #   [[ "$#" -ne 0 ]] &&  echo "$@" | tr '[:upper:]' '[:lower:]'
+  # else
+  #   cat - | tr '[:upper:]' '[:lower:]'
+  # fi
   if [ -t 0 ]; then
-    [[ "$#" -ne 0 ]] &&  echo "$@" | tr '[:upper:]' '[:lower:]'
+    [[ "$#" -ne 0 ]] &&  echo "$@"
   else
-    cat - | tr '[:upper:]' '[:lower:]'
-  fi
+    cat -
+  fi | tr '[:upper:]' '[:lower:]'
 }
 
 str.toUpper() {
@@ -101,10 +100,10 @@ str.toUpper() {
   # param1+ 文字列
   # return 大文字に変換した文字列
   if [ -t 0 ]; then
-    [[ "$#" -ne 0 ]] &&  echo "$@" | tr '[:lower:]' '[:upper:]'
+    [[ "$#" -ne 0 ]] &&  echo "$@"
   else
-    cat - | tr '[:lower:]' '[:upper:]'
-  fi
+    cat -
+  fi | tr '[:lower:]' '[:upper:]'
 }
 
 str.toLf() {
@@ -112,10 +111,10 @@ str.toLf() {
   # param1+ ファイル名
   # return 改行コードを LF に変換した文字列
   if [ -t 0 ]; then
-    [[ "$#" -ne 0 ]] &&  cat "$@" | tr -d \\r
+    [[ "$#" -ne 0 ]] &&  cat "$@"
   else
-    cat - | tr -d \\r
-  fi
+    cat -
+  fi | tr -d \\r
 }
 
 str.toCrLf() {
@@ -123,10 +122,10 @@ str.toCrLf() {
   # param1+ ファイル名
   # return 改行コードを LF に変換した文字列
   if [ -t 0 ]; then
-    [[ "$#" -ne 0 ]] &&  cat "$@" | str.toLf | sed 's/$/\r/g'
+    [[ "$#" -ne 0 ]] &&  cat "$@"
   else
-    cat - | str.toLf | sed 's/$/\r/g'
-  fi
+    cat -
+  fi | str.toLf | sed 's/$/\r/g'
 }
 
 str.isInteger() {
@@ -134,11 +133,8 @@ str.isInteger() {
   # param1 入力文字列
   # returnCd 0:整数 1:整数ではない
   [[ "$#" -eq 0 ]] && return 1
-  local arg="$1"
-  expr "${arg}" + 1 >/dev/null 2>&1
-  if [ $? -ge 2 ]; then
-    return 1
-  fi
+  expr "${1}" + 1 >/dev/null 2>&1
+  [[ $? -lt 2 ]]
 }
 
 str.isNumber() {
@@ -146,8 +142,7 @@ str.isNumber() {
   # param1 入力文字列
   # returnCd 0:数値 1:数値ではない
   [[ "$#" -eq 0 ]] && return 1
-  local arg="$1"
-  str.isInteger "${arg/./}"
+  str.isInteger "${1/./}"
   return "$?"
 }
 
@@ -156,7 +151,5 @@ str.times() {
   # param1 文字列
   # param2 指定回数（デフォルト1回）
   # return 指定回数繰り返された文字列
-  local str=${1:-''};shift
-  local cnt=${1:-1}
-  eval "printf '${str}%.0s' {1..${cnt}}"
+  eval "printf '${1:-''}%.0s' {1..${2:-1}}"
 }
