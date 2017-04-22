@@ -109,7 +109,7 @@ setup() {
   [ "${output}" == 'hoge' ]
 }
 
-@test "time.timeout : over time " {
+@test "time.timeout : out of time " {
   run time.timeout 3s bash -c 'sleep 5s; echo "hoge"'
   echo "status: ${status}"
   echo "output: ${output}"
