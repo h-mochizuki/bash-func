@@ -8,6 +8,54 @@ setup() {
   TEST_ARRAY=( "ONE" "TWO" "THREE" )
 }
 
+@test "arr.join : empty" {
+  run arr.join
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "" ]
+}
+
+@test "arr.join : one" {
+  run arr.join "ONE"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "ONE" ]
+}
+
+@test "arr.join : one with delimiter" {
+  run arr.join -d 'hoge' "ONE"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "ONE" ]
+}
+
+@test "arr.join : one with prefix and suffix" {
+  run arr.join -p '(' -s ')' "ONE"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "(ONE)" ]
+}
+
+@test "arr.join : with delimiter" {
+  run arr.join -d ' or ' "${TEST_ARRAY[@]}"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "ONE or TWO or THREE" ]
+}
+
+@test "arr.join : with delimiter, prefix, suffix" {
+  run arr.join -d ', ' -p '[' -s ']' "${TEST_ARRAY[@]}"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "[ONE, TWO, THREE]" ]
+}
+
 @test "arr.indexOf <= 0 : not exists" {
   run arr.indexOf "ZERO" "${TEST_ARRAY[@]}"
   echo "status: ${status}"

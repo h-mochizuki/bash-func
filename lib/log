@@ -167,7 +167,7 @@ log.error() {
 }
 
 log.to() {
-  # ログを出力します
+  # 対象処理を実施してログをファイルに出力します
   # input-stream 入力ストリーム
   # param1 ログファイル名（なければデフォルト値）
   # param2+ 対象処理（入力ストリーム優先）
@@ -194,7 +194,7 @@ log.to() {
   fi
   if [ -t 0 ]; then
     if [ "${cmd:+_}" == "_" ];then
-      "$cmd" "${args[@]}" | tee -a "$logfile"
+      "$cmd" "${args[@]}" 2>&1 | tee -a "$logfile"
     fi
   else
     cat - | tee -a "$logfile"
@@ -205,7 +205,7 @@ log.watch() {
   # ログを監視します
   # param1 ログファイル名
   # param2 検知パターン
-  # param3+ 検知時に処理したい内容（行内容がStreamで渡されます）
+  # param3+ 検知時に処理したい内容（行内容がストリームで渡されます）
   local logfile=$(echo "$1" | sed -e 's|/|\\/|g');shift
   [[ ! -f "$logfile" ]] && touch "$logfile"
   local pattern="$1";shift
@@ -213,12 +213,14 @@ log.watch() {
   if [ ${#actions[@]} -eq 0 ];then
     actions=( 'cat' )
   fi
+  local fork="$(arr.join -d ') >(' -p '>(' -s ')' ${actions[@]})"
   tail -n 0 --follow=name --retry "$logfile" | while read l;do
     if echo "$l" | grep -q -e "$pattern";then
-      for act in "${actions[@]}";do
-        echo "act : $act"
-        echo "$l" | $act
-      done
+      # for act in "${actions[@]}";do
+      #   echo "act : $act"
+      #   echo "$l" | $act
+      # done
+      echo "$l" | tee $fork
     fi
   done
 }
