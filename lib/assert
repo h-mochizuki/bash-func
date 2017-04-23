@@ -33,17 +33,17 @@ assert.installed() {
   # param1 コマンドやファンクション
   # returnCd 0:実行可能 1:実行不可
   [[ "$#" -eq 0 ]] && return 1
-  local target="$1"
-  local targetType="$(type -t ${target})"
-  if [[ "${targetType}" == "builtin" ]] || [[ "${targetType}" == "function" ]];then
-    return 0
-  elif [[ "${targetType}" == "file" ]] && $(assert.executable "$(type -P ${target})");then
-    return 0
-  elif [[ "${targetType}" == "alias" ]] && $(assert.executable "$(type -P ${target})");then
-    return 0
-  else
-    return 1
-  fi
+  case "$(type -t ${1})" in
+    builtin|function)
+      return 0
+      ;;
+    file|alias)
+      assert.executable $(type -P "${1}")
+      ;;
+    *)
+      return 1
+      ;;
+  esac
 }
 
 assert.executable() {
