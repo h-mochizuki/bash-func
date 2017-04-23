@@ -1,37 +1,14 @@
 #!/bin/bash
 # =====================================
-#            一括読み込み関数定義
+#             定義表示関数定義
 # =====================================
 base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
 
 # ----------------
 #     関数定義
 # ----------------
-load() {
-  # 指定されたディレクトリ以下のファイルを source で読み込みます
-  # param1 ディレクトリパス（デフォルト：カレントディレクトリ）
-  local targetDir="$(cd ${1:-$base};pwd)"
-  if [ -d "${targetDir}" ]; then
-    for f in $(find "${targetDir}" -maxdepth 1 -type f | awk '{ print $NF }');do
-      if __loadable "$f";then
-        source "$f"
-      fi
-    done
-  fi
-}
-
-__loadable() {
-  local s
-  for s in "${BASH_SOURCE[@]}";do
-    if [[ "__${s}__" == "__${1:-$s}__" ]];then
-      return 1
-    fi
-  done
-  return 0
-}
-
 show-def() {
-  # 指定された関数の定義を表示します
+  # 指定された関数が既に読みこまれている場合に、その定義を表示します
   # このディレクトリに定義された関数以外は type コマンドの結果を返します
   # param1 関数名
   if [[ "$#" -eq 0 ]];then
@@ -48,3 +25,5 @@ show-def() {
     fi
   fi
 }
+
+[[ "$#" -ne 0 ]] && show-def "$1"
