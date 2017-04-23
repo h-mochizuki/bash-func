@@ -2,6 +2,8 @@
 # =====================================
 #           ログ出力関数定義
 # =====================================
+base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
+source "${base}/arr"
 
 # ----------------
 #     初期設定
@@ -199,28 +201,4 @@ log.to() {
   else
     cat - | tee -a "$logfile"
   fi
-}
-
-log.watch() {
-  # ログを監視します
-  # param1 ログファイル名
-  # param2 検知パターン
-  # param3+ 検知時に処理したい内容（行内容がストリームで渡されます）
-  local logfile=$(echo "$1" | sed -e 's|/|\\/|g');shift
-  [[ ! -f "$logfile" ]] && touch "$logfile"
-  local pattern="$1";shift
-  local actions=( "$@" )
-  if [ ${#actions[@]} -eq 0 ];then
-    actions=( 'cat' )
-  fi
-  local fork="$(arr.join -d ') >(' -p '>(' -s ')' ${actions[@]})"
-  tail -n 0 --follow=name --retry "$logfile" | while read l;do
-    if echo "$l" | grep -q -e "$pattern";then
-      # for act in "${actions[@]}";do
-      #   echo "act : $act"
-      #   echo "$l" | $act
-      # done
-      echo "$l" | tee $fork
-    fi
-  done
 }
