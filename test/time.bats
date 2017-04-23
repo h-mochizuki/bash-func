@@ -33,12 +33,12 @@ setup() {
   [ "${output}" == '[elapsed 0 sec]' ]
 }
 
-@test "time.elapsed : sleep 5s -> [elapsed 5 sec]" {
-  run time.elapsed sleep 5s
+@test "time.elapsed : sleep 2s -> [elapsed 2 sec]" {
+  run time.elapsed sleep 2s
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
-  [ "${output}" == '[elapsed 5 sec]' ]
+  [ "${output}" == '[elapsed 2 sec]' ]
 }
 
 @test "time.diffTimestamp : 0 ~ 0 -> 0s" {
