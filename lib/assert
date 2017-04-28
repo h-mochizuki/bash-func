@@ -4,6 +4,7 @@
 # =====================================
 base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
 source "${base}/log"
+source "${base}/file"
 
 # ----------------
 #     関数定義
@@ -38,36 +39,12 @@ assert.installed() {
       return 0
       ;;
     file|alias)
-      assert.executable $(type -P "${1}")
+      file.executable $(type -P "${1}")
       ;;
     *)
       return 1
       ;;
   esac
-}
-
-assert.executable() {
-  # 指定されたファイルが実行可能かを返します
-  # param1 ファイルパス
-  # returnCd 0:実行可能 1:実行不可
-  [[ "$#" -eq 0 ]] && return 1
-  [[ ! -z "${1+x}" ]] && [[ -x "${1}" ]]
-}
-
-assert.writable() {
-  # 指定されたファイルが書込可能かを返します
-  # param1 ファイルパス
-  # returnCd 0:書込可能 1:書込不可
-  [[ "$#" -eq 0 ]] && return 1
-  [[ ! -z "${1+x}" ]] && [[ -w "${1}" ]]
-}
-
-assert.readable() {
-  # 指定されたファイルが読込可能かを返します
-  # param1 ファイルパス
-  # returnCd 0:読込可能 1:読込不可
-  [[ "$#" -eq 0 ]] && return 1
-  [[ ! -z "${1+x}" ]] && [[ -r "${1}" ]]
 }
 
 assert.exec() {

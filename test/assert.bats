@@ -5,23 +5,9 @@
 
 setup() {
   load $BATS_TEST_DIRNAME/../lib/assert
-  EXEC_FILE="${BATS_TMPDIR}/execfile"
-  touch "${EXEC_FILE}"
-  chmod +x "${EXEC_FILE}"
-  NOTEXEC_FILE="${BATS_TMPDIR}/notexecfile"
-  touch "${NOTEXEC_FILE}"
 
   # テスト用にフォーマットを変更
   LOG_FORMAT='[%level]%msg'
-}
-
-teardown() {
-  if [ ! -z "${EXEC_FILE+x}" ];then
-    rm -f "${EXEC_FILE}"
-  fi
-  if [ ! -z "${NOTEXEC_FILE+x}" ];then
-    rm -f touch "${NOTEXEC_FILE}"
-  fi
 }
 
 @test "assert.isRoot : root" {
@@ -69,27 +55,6 @@ teardown() {
 
 @test "assert.installed : not defined" {
   run assert.installed notdefinedcommand
-  echo "status: ${status}"
-  echo "output: ${output}"
-  [ "$status" -eq 1 ]
-}
-
-@test "assert.executable : empty" {
-  run assert.executable
-  echo "status: ${status}"
-  echo "output: ${output}"
-  [ "$status" -eq 1 ]
-}
-
-@test "assert.executable : executable" {
-  run assert.executable "${EXEC_FILE}"
-  echo "status: ${status}"
-  echo "output: ${output}"
-  [ "$status" -eq 0 ]
-}
-
-@test "assert.executable : not executable" {
-  run assert.executable "${NOTEXEC_FILE}"
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 1 ]

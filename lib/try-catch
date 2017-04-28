@@ -21,7 +21,7 @@ trycatch.example() {
 # ===================
 # Try Catch Excample.
 # ===================
-source ${base}/trycatch
+source ${base}/try-catch
 
 # define exceptons
 export AnException=100
