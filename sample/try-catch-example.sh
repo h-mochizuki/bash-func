@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 # try catchを試します
 base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
-source ${base}/../lib/try-catch
+source "${base}/../lib/try-catch"
 
 # ある例外
 export AnException=100
