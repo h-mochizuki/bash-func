@@ -27,3 +27,23 @@ file.readable() {
   # returnCd 0:読込可能 1:読込不可
   [[ "$#" -ne 0 ]] && [[ ! -z "${1+x}" ]] && [[ -r "${1}" ]]
 }
+
+file.size() {
+  # 指定されたファイルのバイトサイズを返します
+  # 指定がない場合はカレントディレクトリのサイズ一覧が表示されます
+  # opt: h サイズをKやMなどの分かりやすい単位にまとめます
+  # param1+ ファイルパス
+  # return ファイルサイズ
+  local OPTIND
+  local option=-l
+  while getopts h OPT
+  do
+    case $OPT in
+      h) option=-lh
+      ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+
+  ls ${option} "$@" | awk '/^-/{print $5"\t"$NF}'
+}

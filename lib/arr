@@ -13,6 +13,7 @@ arr.join() {
   # opt: s サフィックス（接尾辞）
   # param1+ 配列
   # return 配列を連結した文字列
+  local OPTIND
   local delimiter=''
   local prefix=''
   local suffix=''
