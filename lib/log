@@ -197,7 +197,7 @@ log.error() {
 log.to() {
   # 対象処理を実施してログをファイルに出力します
   # input-stream 入力ストリーム
-  # param1 ログファイル名（なければデフォルト値）
+  # param1 ログファイル名（デフォルト： <ファイル名>_<タイムスタンプ>.log）
   # param2+ 対象処理（入力ストリーム優先）
   local timestamp=$(date +"${TIMESTAMP_FORMAT}")
   local basefile=$(echo "$0" | sed -e 's/^-*//')
