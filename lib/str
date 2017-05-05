@@ -123,6 +123,21 @@ str.toCrLf() {
   str.stream "$@" | str.toLf | sed 's/$/\r/g'
 }
 
+str.charset() {
+  # 文字コードを返します
+  # param1+ ファイル名
+  # return 文字コード
+  local p c
+  for p in "$@";do
+    c=$(file -i "${p}" | sed -e 's/^.*=//' | str.toUpper)
+    if [[ "${c}" ==  'UNKNOWN-8BIT' ]];then
+      echo -e "SHIFT-JIS\t${p}"
+    else
+      echo -e "${c}\t${p}"
+    fi
+  done
+}
+
 str.isInteger() {
   # 入力文字列が整数かどうかを返します
   # param1 入力文字列
