@@ -87,9 +87,9 @@ file.size() {
   for p in "$@";do
     if [[ ! -z "${1+p}" ]];then
       if [[ -d "$p" ]];then
-        echo "$(du -b ${p})/"
+        echo -e "$(du -b --max-depth=0 $(cd ${p};pwd))/"
       elif [[ -e "$p" ]];then
-        echo -e "$(wc -c < $p)\t$p"
+        echo -e "$(stat -c %s ${p})\t$(cd $(dirname ${p});pwd)/$(basename ${p})"
       fi
     fi
   done
