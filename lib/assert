@@ -60,3 +60,65 @@ assert.exec() {
     fi
   fi
 }
+
+__assert.__lock() {
+  # ロックファイルを作成します
+  # 既にファイルがある場合は、指定時間だけ待機します
+  # param1 タイムアウト時間
+  # param2 ロックファイル
+  # returnCd 0:正常 124:タイムアウトエラー
+  local startTime=$(date +'%s')
+  local currentTime
+  local timeout="${1:?'timeout is reuqired.'}";shift
+  local lockfile="${1:?'lockfile is reuqired.'}";shift
+
+  while true;do
+    ( umask 0777; : > "${lockfile}" ) 2> /dev/null
+    if [[ $? -eq 0 ]];then
+      return 0
+    fi
+    currentTime=$(date +'%s')
+    if [[ $((currentTime - startTime)) -gt ${timeout} ]];then
+      log.logger 'ERROR' "lock timeout : {}s" "${timeout}"
+      return 124
+    fi
+  done
+}
+
+assert.unlock() {
+  # ロックファイルを削除します
+  # param1 ロックファイル
+  local exitCd=$?
+  rm -f "${1:?'lockfile is required.'}"
+  exit "${exitCd}"
+}
+
+assert.lock() {
+  # ロックファイルを作成します
+  # 既にファイルがある場合は、指定時間だけ待機します
+  # opt: w タイムアウト秒数（デフォルト：10秒）
+  # param1 ロックファイル（デフォルト：呼び出し元Bashソースファイル）
+  # returnCd 0:正常 124:タイムアウトエラー
+  # ----
+  # サブシェルから抜けることで自動ロック解除を行います。
+  # こんな感じで使ってください。
+  # (
+  #   assert.lock 'lockme.lock'
+  #   # 何かの処理
+  # )
+  local OPTIND
+  local timeout
+  local lockfile
+  while getopts w: OPT
+  do
+    case $OPT in
+      w) timeout=$OPTARG
+      ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+  lockfile="${1:-$(basename ${BASH_SOURCE[1]:-main}).lock}"
+
+  __assert.__lock "${timeout:-10}" "${lockfile}" || exit
+  trap "assert.unlock '${lockfile}'" EXIT HUP INT QUIT TERM
+}

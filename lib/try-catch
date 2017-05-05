@@ -22,6 +22,7 @@ trycatch.example() {
 # Try Catch Excample.
 # ===================
 source ${base}/try-catch
+source ${base}/log
 
 # define exceptons
 export AnException=100
@@ -29,19 +30,19 @@ export AnException=100
 # start with a try
 try
 ( # open a subshell !!!
-  echo "do something"
+  log.info "do something"
   [ someErrorCondition ] && throw \$AnException "This is Test"
 
-  echo "finished"
+  log.info "finished"
 )
 # directly after closing the subshell you need to connect a group to the catch using ||
 catch || {
   case \$EXCEPTION_CD in
     \$AnException)
-      echo "\$EXCEPTION_CD : AnException was thrown"
+      log.error "\$EXCEPTION_CD : AnException was thrown"
     ;;
     *)
-      echo "\$EXCEPTION_CD : An unexpected exception was thrown"
+      log.error "\$EXCEPTION_CD : An unexpected exception was thrown"
       throw \$exitCd
     ;;
   esac
