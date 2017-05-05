@@ -27,6 +27,8 @@ LOG_FORMAT='[%datetime][%level][%file#%func:%line]:%msg%eol'
 DATETIME_FORMAT='%Y-%m-%d %H:%M:%S'
 # 改行コード
 LINE_SEPARATOR='\n'
+# 標準出力にログ出力するかどうかのフラグ（TRUE:出力する FALSE:出力しない）
+OUTPUT_LOGGING='TRUE'
 # システムログに出力するかどうかのフラグ（TRUE:出力する FALSE:出力しない）
 SYSTEM_LOGGING='FALSE'
 
@@ -41,6 +43,7 @@ log.settings() {
   echo "LOG_FORMAT=$LOG_FORMAT"
   echo "DATETIME_FORMAT=$DATETIME_FORMAT"
   echo "LINE_SEPARATOR=$LINE_SEPARATOR"
+  echo "OUTPUT_LOGGING=$OUTPUT_LOGGING"
   echo "SYSTEM_LOGGING=$SYSTEM_LOGGING"
 }
 
@@ -154,17 +157,18 @@ log.logger() {
   done
 
   # ログ出力
-  local spaces='     '
-  echo -ne "$logformat" | \
-    sed -e "s/%datetime/$datetime/g" \
-        -e "s/%level/$level${spaces:${#level}}/g" \
-        -e "s/%file/$file/g" \
-        -e "s/%func/$func/g" \
-        -e "s/%line/$line/g" \
-        -e "s/%msg/$msg/g" \
-        -e "s/%eol/${linesepalator}/g"
-
-  if [ "${SYSTEM_LOGGING:-FALSE}" == 'TRUE' ];then
+  if [ $(echo ${OUTPUT_LOGGING:-"TRUE"} | awk '{print toupper($0)}') == 'TRUE' ];then
+    local spaces='     '
+    echo -ne "$logformat" | \
+      sed -e "s/%datetime/$datetime/g" \
+          -e "s/%level/$level${spaces:${#level}}/g" \
+          -e "s/%file/$file/g" \
+          -e "s/%func/$func/g" \
+          -e "s/%line/$line/g" \
+          -e "s/%msg/$msg/g" \
+          -e "s/%eol/${linesepalator}/g"
+  fi
+  if [ $(echo ${SYSTEM_LOGGING:-"FALSE"} | awk '{print toupper($0)}') == 'TRUE' ];then
     log.syslogger "${level}" "${msg}"
   fi
 }
