@@ -138,6 +138,42 @@ str.charset() {
   done
 }
 
+str.convert() {
+  # 文字コード及び改行コードを変更します
+  # opt: f 変更元文字コード（デフォルト: str.charset の結果）
+  # opt: t 変更後文字コード（デフォルト: UTF-8）
+  # opt: l 変更後改行コード（LF | CRLF, デフォルト: LF）
+  # param1+ ファイル名
+  local OPTIND
+  local p
+  local from
+  local to='UTF-8'
+  local lineseparator='LF'
+  while getopts f:t:l: OPT
+  do
+    case $OPT in
+      f) from="$(str.toUpper $OPTARG)"
+      ;;
+      t) to="$(str.toUpper $OPTARG)"
+      ;;
+      l) lineseparator="$(str.toUpper $OPTARG)"
+      ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+
+  for p in "$@";do
+    if [ -z "${from+x}" ];then
+      from=$(str.charset "${p}" | awk '{ print $1 }')
+    fi
+    if [ "${lineseparator}" == "LF" ];then
+      iconv -f "${from}" -t "${to}" "${p}" | str.toLf
+    else
+      iconv -f "${from}" -t "${to}" "${p}" | str.toCrLf
+    fi
+  done
+}
+
 str.isInteger() {
   # 入力文字列が整数かどうかを返します
   # param1 入力文字列
