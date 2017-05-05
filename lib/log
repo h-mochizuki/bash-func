@@ -27,6 +27,8 @@ LOG_FORMAT='[%datetime][%level][%file#%func:%line]:%msg%eol'
 DATETIME_FORMAT='%Y-%m-%d %H:%M:%S'
 # 改行コード
 LINE_SEPARATOR='\n'
+# システムログに出力するかどうかのフラグ（TRUE:出力する FALSE:出力しない）
+SYSTEM_LOGGING='FALSE'
 
 # ----------------
 #     関数定義
@@ -39,6 +41,7 @@ log.settings() {
   echo "LOG_FORMAT=$LOG_FORMAT"
   echo "DATETIME_FORMAT=$DATETIME_FORMAT"
   echo "LINE_SEPARATOR=$LINE_SEPARATOR"
+  echo "SYSTEM_LOGGING=$SYSTEM_LOGGING"
 }
 
 log.setAbort() {
@@ -89,6 +92,23 @@ log.setTrace() {
     trap - DEBUG
     echo "trace : off"
   fi
+}
+
+log.syslogger() {
+  # システムログに出力します
+  # 強制的にプロセスID、ユーザ名が出力されます
+  # log.logger から呼び出されることを想定しています
+  # param1 ログレベル（pオプション）
+  # param2+ ログメッセージ
+  local priority=$(echo ${1:-"INFO"} | awk '{print tolower($0)}');shift
+  if [ "${priority}" == "trace" ];then
+    priority='debug'
+  elif [ "${priority}" == "error" ];then
+    priority='err'
+  elif [ "${priority}" == "fatal" ];then
+    priority='crit'
+  fi
+  logger -i -p "${priority}" "$@"
 }
 
 log.logger() {
@@ -143,6 +163,10 @@ log.logger() {
         -e "s/%line/$line/g" \
         -e "s/%msg/$msg/g" \
         -e "s/%eol/${linesepalator}/g"
+
+  if [ "${SYSTEM_LOGGING:-FALSE}" == 'TRUE' ];then
+    log.syslogger "${level}" "${msg}"
+  fi
 }
 
 log.info() {
