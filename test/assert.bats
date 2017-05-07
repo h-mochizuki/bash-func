@@ -75,11 +75,3 @@ setup() {
   [ "$status" -eq 1 ]
   [ "${output}" == '[ERROR]!!FAILED!! -exec-> false ' ]
 }
-
-@test "assert.lock : lock" {
-  run assert.lock -w 1 "test" &
-  run assert.lock -w 1 "test"
-  echo "status: ${status}"
-  echo "output: ${output}"
-  [ "$status" -eq 124 ]
-}
