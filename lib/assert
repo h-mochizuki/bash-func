@@ -71,6 +71,11 @@ __assert.__lock() {
   local currentTime
   local timeout="${1:?'timeout is reuqired.'}";shift
   local lockfile="${1:?'lockfile is reuqired.'}";shift
+  expr "${timeout}" + 1 >/dev/null 2>&1
+  if [[ $? -ge 2 ]];then
+    echo "Timeout is number only : ${timeout}" >&2
+    return 1
+  fi
 
   while true;do
     ( umask 0777; : > "${lockfile}" ) 2> /dev/null
@@ -98,7 +103,7 @@ assert.lock() {
   # 既にファイルがある場合は、指定時間だけ待機します
   # opt: w タイムアウト秒数（デフォルト：10秒）
   # param1 ロックファイル（デフォルト：呼び出し元Bashソースファイル）
-  # returnCd 0:正常 124:タイムアウトエラー
+  # returnCd 0:正常 1: タイムアウト秒数指定エラー 124:タイムアウトエラー
   # ----
   # サブシェルから抜けることで自動ロック解除を行います。
   # ロックファイルは用途に応じて指定します。
@@ -117,6 +122,7 @@ assert.lock() {
     esac
   done
   shift $((OPTIND - 1))
+
   lockfile="${1:-$(basename ${BASH_SOURCE[1]:-main}).lock}"
 
   __assert.__lock "${timeout:-10}" "${lockfile}" || exit
