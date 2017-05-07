@@ -90,12 +90,12 @@ assert.retry() {
 
   expr "${max}" + 1 >/dev/null 2>&1
   if [[ $? -ge 2 ]];then
-    echo "Max-retry-count is number only : ${max}" >&2
+    log.logger "Max-retry-count is number only : ${max}" >&2
     return 1
   fi
   expr "${waittime}" + 1 >/dev/null 2>&1
   if [[ $? -ge 2 ]];then
-    echo "Wait-time is number only : ${waittime}" >&2
+    log.logger "Wait-time is number only : ${waittime}" >&2
     return 1
   fi
 
@@ -129,7 +129,7 @@ __assert.__lock() {
   local lockfile="${1:?'lockfile is reuqired.'}";shift
   expr "${timeout}" + 1 >/dev/null 2>&1
   if [[ $? -ge 2 ]];then
-    echo "Timeout is number only : ${timeout}" >&2
+    log.logger "Timeout is number only : ${timeout}" >&2
     return 1
   fi
 
