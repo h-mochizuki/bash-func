@@ -61,6 +61,62 @@ assert.exec() {
   fi
 }
 
+assert.retry() {
+  # 渡されたコマンドを実行して、エラーだった場合には指定回数繰返します
+  # 最後までエラーの場合は全体の処理を終了します
+  # opt: n 繰り返し回数（デフォルト：5 回）
+  # opt: w 繰返し間隔（デフォルト：1秒）
+  # param1+ 実行コマンド
+  # exitCd 1:処理エラー
+  local OPTIND
+  local count=1
+  local max=5
+  local waittime=1
+  while getopts n:w: OPT
+  do
+    case $OPT in
+      n) max=$OPTARG
+      ;;
+      w) waittime=$OPTARG
+      ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+  if [ "$#" -eq 0 ];then
+    return 0
+  fi
+  local cmd="$1";shift
+  local args=( "$@" )
+
+  expr "${max}" + 1 >/dev/null 2>&1
+  if [[ $? -ge 2 ]];then
+    echo "Max-retry-count is number only : ${max}" >&2
+    return 1
+  fi
+  expr "${waittime}" + 1 >/dev/null 2>&1
+  if [[ $? -ge 2 ]];then
+    echo "Wait-time is number only : ${waittime}" >&2
+    return 1
+  fi
+
+  if "$cmd" "${args[@]}";then
+    :
+  elif [ ${count} -ge ${max} ];then
+    log.logger 'ERROR' "!!FAILED:RETRY ${max}!! -exec-> $cmd ${args[@]//\"/}"
+    exit 1
+  else
+    count=$((count + 1))
+    while sleep "${waittime}";do
+      "$cmd" "${args[@]}" || if [ ${count} -lt ${max} ];then
+        count=$((count + 1))
+      else
+        log.logger 'ERROR' "!!FAILED:RETRY ${max}!! -exec-> $cmd ${args[@]//\"/}"
+        exit 1
+      fi
+    done
+  fi
+}
+
 __assert.__lock() {
   # ロックファイルを作成します
   # 既にファイルがある場合は、指定時間だけ待機します
