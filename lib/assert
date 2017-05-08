@@ -139,12 +139,10 @@ __assert.__lock() {
     #   echo $(ls -ltr "${lockfile}")
     #   return 0
     # fi
-    : > "${lockfile}" 2> /dev/null
+    ( : > "${lockfile}" ) 2>/dev/null
     local re=$?
-    chmod 0000 "${lockfile}"
+    ( [[ -f "${lockfile}" ]] && chmod 0000 "${lockfile}" ) 2>/dev/null
     if [[ "${re}" -eq 0 ]];then
-      echo "return : $rere"
-      echo $(ls -ltr "${lockfile}")
       return 0
     fi
     currentTime=$(date +'%s')
