@@ -8,11 +8,11 @@
 # ----------------
 # ※ 上書きしたい場合は、このファイルを読み込んだ後で実施してください
 # ログディレクトリ
-LOG_DIR=
+export LOG_DIR=
 # ログファイル
-LOG_FILE='%file_%timestamp.log'
+export LOG_FILE='%file_%timestamp.log'
 # タイムスタンプフォーマット（date 関数で使用可能なフォーマット）
-TIMESTAMP_FORMAT='%Y%m%d'
+export TIMESTAMP_FORMAT='%Y%m%d'
 # ログフォーマット
 # 利用可能変数
 #   %datetime : TIMESTAMP_FORMAT による日付で置換される
@@ -22,15 +22,15 @@ TIMESTAMP_FORMAT='%Y%m%d'
 #   %line : 行番号で置換される
 #   %msg : メッセージが置換される
 #   %eol : LINE_SEPARATOR による改行コードで置換される
-LOG_FORMAT='[%datetime][%level][%file#%func:%line]:%msg%eol'
+export LOG_FORMAT='[%datetime][%level][%file#%func:%line]:%msg%eol'
 # 日時フォーマット（date 関数で使用可能なフォーマット）
-DATETIME_FORMAT='%Y-%m-%d %H:%M:%S'
+export DATETIME_FORMAT='%Y-%m-%d %H:%M:%S'
 # 改行コード
-LINE_SEPARATOR='\n'
+export LINE_SEPARATOR='\n'
 # 標準出力にログ出力するかどうかのフラグ（TRUE:出力する FALSE:出力しない）
-OUTPUT_LOGGING='TRUE'
+export OUTPUT_LOGGING='TRUE'
 # システムログに出力するかどうかのフラグ（TRUE:出力する FALSE:出力しない）
-SYSTEM_LOGGING='FALSE'
+export SYSTEM_LOGGING='FALSE'
 
 # ----------------
 #     関数定義
