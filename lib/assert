@@ -134,11 +134,6 @@ __assert.__lock() {
   fi
 
   while true;do
-    # ( umask 0777; : > "${lockfile}" ) 2> /dev/null
-    # if [[ $? -eq 0 ]];then
-    #   echo $(ls -ltr "${lockfile}")
-    #   return 0
-    # fi
     ( : > "${lockfile}" ) 2>/dev/null
     local re=$?
     ( [[ -f "${lockfile}" ]] && chmod 0000 "${lockfile}" ) 2>/dev/null
