@@ -177,6 +177,8 @@ log.info() {
   # INFOログ
   # param1 ログテンプレート
   # param2+ 置換パラメータ
+  # usage)
+  # log.info "This is {}." "a pen" => '[INFO]This is a pen.'
   log.logger 'INFO' "$@"
 }
 
@@ -184,6 +186,8 @@ log.warn() {
   # WARNログ
   # param1 ログテンプレート
   # param2+ 置換パラメータ
+  # usage)
+  # log.warn "This is {}." "a pen" => '[WARN]This is a pen.'
   log.logger 'WARN' "$@" 1>&2
 }
 
@@ -191,6 +195,8 @@ log.error() {
   # ERRORログ
   # param1 ログテンプレート
   # param2+ 置換パラメータ
+  # usage)
+  # log.error "This is {}." "a pen" => '[ERROR]This is a pen.'
   log.logger 'ERROR' "$@" 1>&2
 }
 
@@ -199,6 +205,14 @@ log.to() {
   # input-stream 入力ストリーム
   # param1 ログファイル名（デフォルト： <ファイル名>_<タイムスタンプ>.log）
   # param2+ 対象処理（入力ストリーム優先）
+  # usage1)
+  # {
+  #  log.info "message"
+  #  log.error "error message."
+  # } 2>&1 | log.to 'operation.log'
+  #
+  # usage2)
+  # log.to 'operation.log' 'bash' '-c' 'operation.sh'
   local timestamp=$(date +"${TIMESTAMP_FORMAT}")
   local basefile=$(echo "$0" | sed -e 's/^-*//')
   local logfile=$(echo "$LOG_FILE" | sed -e "s/%timestamp/$timestamp/g" -e "s/%file/$(basename ${basefile%.*})/g")
