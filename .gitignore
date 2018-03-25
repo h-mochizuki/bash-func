@@ -1,3 +1,5 @@
 # ignore settings
 # bats-module
 bats-module/
+.vscode/
+bats-install-*.log
