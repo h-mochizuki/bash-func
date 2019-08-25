@@ -152,6 +152,7 @@ assert.unlock() {
   # ロックファイルを削除します
   # param1 ロックファイル
   local exitCd=$?
+  trap - EXIT HUP INT QUIT TERM
   rm -f "${1:?'lockfile is required.'}"
   exit "${exitCd}"
 }
