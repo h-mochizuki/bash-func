@@ -2,4 +2,5 @@
 # bats-module
 bats-module/
 .vscode/
+*.code-workspace
 bats-install-*.log
