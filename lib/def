@@ -7,12 +7,12 @@ base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
 # ----------------
 #     関数定義
 # ----------------
-show-def() {
+def() {
   # 指定された関数が既に読みこまれている場合に、その定義を表示します
   # このディレクトリに定義された関数以外は type コマンドの結果を返します
   # param1 関数名
   if [[ "$#" -eq 0 ]];then
-    echo "usage: show-def <funcname>" 1>&2
+    echo "usage: def <funcname>" 1>&2
     return 1
   fi
   if [[ $(cat "${BASH_SOURCE:-$0}" | grep -e "^${1}.*(" | wc -l) -ne 0 ]];then
@@ -28,4 +28,4 @@ show-def() {
   fi
 }
 
-[[ "$#" -ne 0 ]] && show-def "$1"
+[[ "$#" -ne 0 ]] && def "$1"
