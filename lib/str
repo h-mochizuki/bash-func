@@ -110,7 +110,7 @@ str.toUpper() {
 str.toLf() {
   # 改行コードを CRLF -> LF 変換します
   # input-stream 入力ストリーム
-  # param1+ ファイル名
+  # param1+ 文字列
   # return 改行コードを LF に変換した文字列
   str.stream "$@" | tr -d \\r
 }
@@ -118,7 +118,7 @@ str.toLf() {
 str.toCrLf() {
   # 改行コードを LF -> CRLF 変換します
   # input-stream 入力ストリーム
-  # param1+ ファイル名
+  # param1+ 文字列
   # return 改行コードを LF に変換した文字列
   str.stream "$@" | str.toLf | sed 's/$/\r/g'
 }
@@ -198,4 +198,14 @@ str.times() {
   # param2 指定回数（デフォルト1回）
   # return 指定回数繰り返された文字列
   eval "printf '${1:-''}%.0s' {1..${2:-1}}"
+}
+
+str.eval() {
+  # 入力内容に含まれる環境変数やスクリプトを評価して返します
+  # input-stream 入力ストリーム
+  # param1+ 文字列
+  # return 環境変数やスクリプトを評価した文字列
+  str.stream "$@" | while read line || [ -n "${line}" ]; do
+    echo $(eval echo "''${line}")
+  done
 }
