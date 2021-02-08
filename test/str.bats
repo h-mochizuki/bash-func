@@ -231,33 +231,33 @@ setup() {
   [ "${output}" == '1234512345123451234512345' ]
 }
 
-@test "str.eval : empty" {
-  run str.eval
+@test "str.evalstr : empty" {
+  run str.evalstr
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
   [ "${output}" == '' ]
 }
 
-@test "str.eval : text" {
-  run str.eval 'abcdefg'
+@test "str.evalstr : text" {
+  run str.evalstr 'abcdefg'
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
   [ "${output}" == 'abcdefg' ]
 }
 
-@test "str.eval : variable" {
+@test "str.evalstr : variable" {
   VAR_TEST='12345'
-  run str.eval '${VAR_TEST}'
+  run str.evalstr '${VAR_TEST}'
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
   [ "${output}" == '12345' ]
 }
 
-@test "str.eval : script" {
-  run str.eval '$(echo "abcdefg")'
+@test "str.evalstr : script" {
+  run str.evalstr '$(echo "abcdefg")'
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
