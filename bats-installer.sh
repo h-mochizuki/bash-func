@@ -51,7 +51,6 @@ function install() {
   infoLog "最新のBatsモジュールを取得しました"
   cd "${DOWNLOAD_DIR}"
   ${DOWNLOAD_DIR}/install.sh "${INSTALL_DIR}"
-  sed -i.org -e "s|^.*|${INSTALL_DIR}/libexec/bats \"\$@\"|" "${INSTALL_DIR}/bin/bats"
   infoLog "Batsモジュールのインストールが完了しました"
 
   if [[ -d "${DOWNLOAD_DIR}" ]];then
