@@ -202,14 +202,8 @@ str.times() {
 
 str.evalstr() {
   # 入力内容に含まれる環境変数やスクリプトを評価した文字列を返します
-  # ビルトインのevalとは挙動が違いますので注意してください
-  #   例）
-  #   eval 'echo $(pwd)' -> /home/you
-  #   str.evalstr 'echo $(pwd)' -> echo /home/you
   # input-stream 入力ストリーム
   # param1+ 文字列
   # return 環境変数やスクリプトを評価した文字列
-  str.stream "$@" | while read line || [ -n "${line}" ]; do
-    echo $(eval echo "''${line}")
-  done
+  str.stream "$@" | eval "echo -e \"$(cat)\""
 }
