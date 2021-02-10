@@ -1,0 +1,43 @@
+#!/bin/bash
+# =====================================
+#         YAMLファイル変換関数定義
+# =====================================
+
+# ----------------
+#     関数定義
+# ----------------
+yml.toEnv() {
+  # YAMLを環境変数として使用できる形に変換します
+  # input-stream 入力ストリーム
+  # param1 入力ファイル
+  # param2 追加接頭語
+  # return 環境変数で使用できるようにしたYAML内容
+  # returnCd 0:変換できた 1:変換できなかった
+  local prefix="$1"
+  [ -t 0 ] && prefix="$2"
+  local s='[[:space:]]*'
+  local w='[a-zA-Z0-9_]*[a-zA-Z0-9_\.-]*'
+  local i='[\.-]'
+  local fs=$(echo @|tr @ '\034')
+  if [ -t 0 ]; then
+    [[ "$#" -ne 0 ]] && cat "$1"
+  else
+    cat -
+  fi | \
+  sed -ne "s|^\($s\):|\1|" \
+       -e "s|^\($s\)\($w\)$s:$s#$s\(.*\)\$|\1$fs\2$fs|p" \
+       -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s#$s.*\$|\1$fs\2$fs\3|p" \
+       -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
+       -e "s|^\($s\)\($w\)$s:$s\(.*[^[:space:]]\+\)$s#$s.*\$|\1$fs\2$fs\3|p" \
+       -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" | \
+  awk -F$fs '{
+    gsub( /'$i'/, "_", $2 )
+    indent = length($1)/2;
+    vname[indent] = $2;
+    for (i in vname) {if (i > indent) {delete vname[i]}}
+    if (length($3) > 0) {
+      vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+      printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
+    }
+  }'
+}
