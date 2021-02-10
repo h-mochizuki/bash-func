@@ -263,3 +263,25 @@ setup() {
   [ "$status" -eq 0 ]
   [ "${output}" == 'abcdefg' ]
 }
+
+@test "str.evalstr : complex" {
+  VAR_TEST='54321'
+  run str.evalstr '''\
+12345
+${VAR_TEST}
+$(echo "abcdefg")
+$(
+  for i in 6 7 8 9 0; do
+    echo -n "$i"
+  done
+)
+'''
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == """\
+12345
+54321
+abcdefg
+67890""" ]
+}
