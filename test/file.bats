@@ -10,9 +10,6 @@ setup() {
   chmod +x "${EXECUTABLE_FILE}"
   NOTEXECUTABLE_FILE="${BATS_TMPDIR}/notexecfile"
   touch "${NOTEXECUTABLE_FILE}"
-
-  # テスト用にフォーマットを変更
-  LOG_FORMAT='[%level]%msg'
 }
 
 teardown() {
@@ -20,7 +17,7 @@ teardown() {
     rm -f "${EXECUTABLE_FILE}"
   fi
   if [ ! -z "${NOTEXECUTABLE_FILE+x}" ];then
-    rm -f touch "${NOTEXECUTABLE_FILE}"
+    rm -f "${NOTEXECUTABLE_FILE}"
   fi
 }
 
