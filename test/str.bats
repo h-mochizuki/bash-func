@@ -269,6 +269,7 @@ setup() {
   run str.evalstr '''\
 12345
 ${VAR_TEST}
+
 $(echo "abcdefg")
 $(
   for i in 6 7 8 9 0; do
@@ -282,6 +283,7 @@ $(
   [ "${output}" == """\
 12345
 54321
+
 abcdefg
 67890""" ]
 }
