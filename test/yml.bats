@@ -15,6 +15,49 @@ setup() {
   [ "${output}" == '' ]
 }
 
+@test "yml.toEnv : line comment" {
+  run yml.toEnv <<EOS
+# hoge
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "yml.toEnv : eol comment1" {
+  run yml.toEnv <<EOS
+hoge: # hoge
+  piyo: piyo # piyo
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'hoge_piyo="piyo"' ]
+}
+
+@test "yml.toEnv : eol comment2 : quoted" {
+  run yml.toEnv <<EOS
+hoge: # hoge
+  piyo: "piyo" # piyo
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'hoge_piyo="piyo"' ]
+}
+
+@test "yml.toEnv : eol comment3 : many times" {
+  run yml.toEnv <<EOS
+hoge: # hoge
+  piyo: "piyo # piyo" # piyo # piyo
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'hoge_piyo="piyo # piyo"' ]
+}
+
 @test "yml.toEnv : only key" {
   run yml.toEnv <<EOS
 key:
@@ -25,7 +68,7 @@ EOS
   [ "${output}" == '' ]
 }
 
-@test "yml.toEnv : one line1" {
+@test "yml.toEnv : one line" {
   run yml.toEnv <<EOS
 key: value
 EOS
@@ -35,7 +78,7 @@ EOS
   [ "${output}" == 'key="value"' ]
 }
 
-@test "yml.toEnv : one line2" {
+@test "yml.toEnv : one line2 : quoted" {
   run yml.toEnv <<EOS
 key: "value"
 EOS
@@ -70,45 +113,21 @@ EOS
 parent_key2="value2"''' ]
 }
 
-@test "yml.toEnv : line comment" {
+@test "yml.toEnv : array" {
   run yml.toEnv <<EOS
-# hoge
+children:
+  - Wendy
+  - Jhon
+  - Michael
+neverland:
+  children:
+    - Peter Pan
 EOS
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
-  [ "${output}" == '' ]
-}
-
-@test "yml.toEnv : eol comment1" {
-  run yml.toEnv <<EOS
-hoge: # hoge
-  piyo: piyo # piyo
-EOS
-  echo "status: ${status}"
-  echo "output: ${output}"
-  [ "$status" -eq 0 ]
-  [ "${output}" == 'hoge_piyo="piyo"' ]
-}
-
-@test "yml.toEnv : eol comment2" {
-  run yml.toEnv <<EOS
-hoge: # hoge
-  piyo: "piyo" # piyo
-EOS
-  echo "status: ${status}"
-  echo "output: ${output}"
-  [ "$status" -eq 0 ]
-  [ "${output}" == 'hoge_piyo="piyo"' ]
-}
-
-@test "yml.toEnv : eol comment3" {
-  run yml.toEnv <<EOS
-hoge: # hoge
-  piyo: "piyo # piyo" # piyo
-EOS
-  echo "status: ${status}"
-  echo "output: ${output}"
-  [ "$status" -eq 0 ]
-  [ "${output}" == 'hoge_piyo="piyo # piyo"' ]
+  [ "${output}" == '''children[1]="Wendy"
+children[2]="Jhon"
+children[3]="Michael"
+neverland_children[1]="Peter Pan"''' ]
 }

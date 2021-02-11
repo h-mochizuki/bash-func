@@ -8,6 +8,8 @@
 # ----------------
 yml.toEnv() {
   # YAMLを環境変数として使用できる形に変換します
+  # 環境変数のキーにドットやハイフンは使用できないため
+  # それらが使用されていた場合アンダースコアに変更されます
   # input-stream 入力ストリーム
   # param1 入力ファイル
   # param2 追加接頭語
@@ -16,7 +18,9 @@ yml.toEnv() {
   local prefix="$1"
   [ -t 0 ] && prefix="$2"
   local s='[[:space:]]*'
+  local c='[[:space:]]\+#.*'
   local w='[a-zA-Z0-9_]*[a-zA-Z0-9_\.-]*'
+  local l='[-]'
   local i='[\.-]'
   local fs=$(echo @|tr @ '\034')
   if [ -t 0 ]; then
@@ -25,19 +29,40 @@ yml.toEnv() {
     cat -
   fi | \
   sed -ne "s|^\($s\):|\1|" \
+       -e "s|^\($s\)\($l\)$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
+       -e "s|^\($s\)\($l\)$s[\"']\(.*\)[\"']$c\$|\1$fs\2$fs\3|p" \
+       -e "s|^\($s\)\($l\)$s\(.*\)$s\$|\1$fs\2$fs\3|p" \
+       -e "s|^\($s\)\($l\)$s\(\([^[:space:]][^#]\)\+\)$c\$|\1$fs\2$fs\3|p" \
        -e "s|^\($s\)\($w\)$s:$s#$s\(.*\)\$|\1$fs\2$fs|p" \
-       -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s#$s.*\$|\1$fs\2$fs\3|p" \
+       -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$c\$|\1$fs\2$fs\3|p" \
        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
-       -e "s|^\($s\)\($w\)$s:$s\(.*[^[:space:]]\+\)$s#$s.*\$|\1$fs\2$fs\3|p" \
+       -e "s|^\($s\)\($w\)$s:$s\(\([^[:space:]][^#]\)\+\)$c\$|\1$fs\2$fs\3|p" \
        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" | \
-  awk -F$fs '{
-    gsub( /'$i'/, "_", $2 )
-    indent = length($1)/2;
-    vname[indent] = $2;
+  awk -F$fs 'BEGIN { idx=0 } {
+    if ($2 !~ /'$l'+/) {
+      gsub( /'$i'/, "_", $2 );
+      idx=0;
+      indent = length($1)/2;
+      vname[indent] = $2;
+    } else {
+      idx++;
+      indent = length($1)/2 + 1;
+      vname[indent] = ("-")(idx);
+      $2 = (idx);
+    }
     for (i in vname) {if (i > indent) {delete vname[i]}}
     if (length($3) > 0) {
-      vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
-      printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
+      vn="";
+      for (i=0; i<indent; i++) {
+        if (length(vname[i]) == 0) {break}
+        vn=(vn)(vname[i])("_");
+      }
+      gsub( /_-([0-9]+)/, "[\1]", vn );
+      if (idx > 0) {
+        printf("%s%s[%s]=\"%s\"\n", "'$prefix'",substr(vn, 1, length(vn)-1), $2, $3);
+      } else {
+        printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
+      }
     }
   }'
 }
