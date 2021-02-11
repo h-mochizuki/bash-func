@@ -129,8 +129,8 @@ EOS
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
-  [ "${output}" == '''children[1]="Wendy"
-children[2]="Jhon"
-children[3]="Michael"
-neverland_children[1]="Peter Pan"''' ]
+  [ "${output}" == '''children[0]="Wendy"
+children[1]="Jhon"
+children[2]="Michael"
+neverland_children[0]="Peter Pan"''' ]
 }

@@ -45,10 +45,10 @@ yml.toEnv() {
       indent = length($1)/2;
       vname[indent] = $2;
     } else {
-      idx++;
       indent = length($1)/2 + 1;
       vname[indent] = ("-")(idx);
       $2 = (idx);
+      idx++;
     }
     for (i in vname) {if (i > indent) {delete vname[i]}}
     if (length($3) > 0) {
