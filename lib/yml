@@ -53,19 +53,19 @@ yml.toEnv() {
       gsub( /'$illegal'/, "_", $2 );
       vname[indent] = $2;
     } else if (length($2) == 1) {
-      indent += 1;
+      indent++;
       vname[indent] = ("-")(idx);
       $2 = ("[")(idx)("]");
       idx++;
       idxs[indent - 1] = idx;
     } else {
-      indent += 1;
       gsub( /^-*[[:space:]]*/, "", $2 );
       gsub( /'$illegal'/, "_", $2 );
+      indent++;
       vname[indent] = ("-")(idx)("'$sep'")($2);
       $2 = ("[")(idx)("]'$sep'")($2);
       idx++;
-      idxs[indent - 1] = ("")(idx);
+      idxs[indent - 1] = idx;
     }
     for (i in vname) {if (i > indent) {delete vname[i]}}
     if (length($3) > 0) {
