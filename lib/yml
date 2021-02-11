@@ -40,12 +40,12 @@ yml.toEnv() {
        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" | \
   awk -F$fs 'BEGIN { idx=0 } {
     if ($2 !~ /'$l'+/) {
+      indent = length($1);
       gsub( /'$i'/, "_", $2 );
-      idx=0;
-      indent = length($1)/2;
       vname[indent] = $2;
+      idx=0;
     } else {
-      indent = length($1)/2 + 1;
+      indent = length($1) + 1;
       vname[indent] = ("-")(idx);
       $2 = (idx);
       idx++;
