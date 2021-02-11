@@ -25,7 +25,7 @@ EOS
   [ "${output}" == '' ]
 }
 
-@test "yml.toEnv : eol comment1" {
+@test "yml.toEnv : simple comment" {
   run yml.toEnv <<EOS
 hoge: # hoge
   piyo: piyo # piyo
@@ -36,7 +36,7 @@ EOS
   [ "${output}" == 'hoge_piyo="piyo"' ]
 }
 
-@test "yml.toEnv : eol comment2 : quoted" {
+@test "yml.toEnv : quoted string and comment" {
   run yml.toEnv <<EOS
 hoge: # hoge
   piyo: "piyo" # piyo
@@ -47,7 +47,7 @@ EOS
   [ "${output}" == 'hoge_piyo="piyo"' ]
 }
 
-@test "yml.toEnv : eol comment3 : many times" {
+@test "yml.toEnv : many comments" {
   run yml.toEnv <<EOS
 hoge: # hoge
   piyo: "piyo # piyo" # piyo # piyo
@@ -68,7 +68,7 @@ EOS
   [ "${output}" == '' ]
 }
 
-@test "yml.toEnv : one line" {
+@test "yml.toEnv : simple value" {
   run yml.toEnv <<EOS
 key: value
 EOS
@@ -78,7 +78,7 @@ EOS
   [ "${output}" == 'key="value"' ]
 }
 
-@test "yml.toEnv : one line2 : quoted" {
+@test "yml.toEnv : quoted value" {
   run yml.toEnv <<EOS
 key: "value"
 EOS
@@ -105,12 +105,15 @@ key2="value2"''' ]
 parent:
   key1: value1
   key2: value2
+  key3:
+    value3: OK!!
 EOS
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
   [ "${output}" == '''parent_key1="value1"
-parent_key2="value2"''' ]
+parent_key2="value2"
+parent_key3_value3="OK!!"''' ]
 }
 
 @test "yml.toEnv : array" {
