@@ -21,7 +21,7 @@ yml.toEnv() {
   local c='[[:space:]]\+#.*'
   local w='[a-zA-Z0-9_]*[a-zA-Z0-9_\.-]*'
   local l='[-]'
-  local i='[\.-]'
+  local illegal='[\.-]'
   local sep='_'
   local fs=$(echo @|tr @ '\034')
   if [ -t 0 ]; then
@@ -50,7 +50,7 @@ yml.toEnv() {
     idx = idxs[indent];
     if (length(idx) == 0) {idx=0}
     if ($2 !~ /^[-]/) {
-      gsub( /'$i'/, "_", $2 );
+      gsub( /'$illegal'/, "_", $2 );
       vname[indent] = $2;
     } else if (length($2) == 1) {
       indent += 1;
@@ -61,6 +61,7 @@ yml.toEnv() {
     } else {
       indent += 1;
       gsub( /^-*[[:space:]]*/, "", $2 );
+      gsub( /'$illegal'/, "_", $2 );
       vname[indent] = ("-")(idx)("'$sep'")($2);
       $2 = ("[")(idx)("]'$sep'")($2);
       idx++;
