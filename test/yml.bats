@@ -116,7 +116,7 @@ parent_key2="value2"
 parent_key3_value3="OK!!"''' ]
 }
 
-@test "yml.toEnv : array" {
+@test "yml.toEnv : simple array" {
   run yml.toEnv <<EOS
 children:
   - Wendy
@@ -133,4 +133,27 @@ EOS
 children[1]="Jhon"
 children[2]="Michael"
 neverland_children[0]="Peter Pan"''' ]
+}
+
+@test "yml.toEnv : complex array" {
+  run yml.toEnv <<EOS
+Children:
+  - London:
+    - Wendy
+    - Jhon
+    - Michael
+  - Neverland:
+    - Peter Pan
+Pirates:
+  - Neverland:
+    - Captain Hook
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '''Children[0]_London[0]="Wendy"
+Children[0]_London[1]="Jhon"
+Children[0]_London[2]="Michael"
+Children[1]_Neverland[0]="Peter Pan"
+Pirates[0]_Neverland[0]="Captain Hook"''' ]
 }

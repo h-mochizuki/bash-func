@@ -22,6 +22,7 @@ yml.toEnv() {
   local w='[a-zA-Z0-9_]*[a-zA-Z0-9_\.-]*'
   local l='[-]'
   local i='[\.-]'
+  local sep='_'
   local fs=$(echo @|tr @ '\034')
   if [ -t 0 ]; then
     [[ "$#" -ne 0 ]] && cat "$1"
@@ -29,6 +30,8 @@ yml.toEnv() {
     cat -
   fi | \
   sed -ne "s|^\($s\):|\1|" \
+       -e "s|^\($s\)\($l$s$w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
+       -e "s|^\($s\)\($l$s$w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" \
        -e "s|^\($s\)\($l\)$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
        -e "s|^\($s\)\($l\)$s[\"']\(.*\)[\"']$c\$|\1$fs\2$fs\3|p" \
        -e "s|^\($s\)\($l\)$s\(.*\)$s\$|\1$fs\2$fs\3|p" \
@@ -38,31 +41,41 @@ yml.toEnv() {
        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
        -e "s|^\($s\)\($w\)$s:$s\(\([^[:space:]][^#]\)\+\)$c\$|\1$fs\2$fs\3|p" \
        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" | \
-  awk -F$fs 'BEGIN { idx=0 } {
-    if ($2 !~ /'$l'+/) {
-      indent = length($1);
+  awk -F$fs 'BEGIN {
+      idx=0;
+      idxs[0]=0;
+    } {
+    indent = length($1);
+    for (i in idxs) {if (i > indent) {delete idxs[i]}}
+    idx = idxs[indent];
+    if (length(idx) == 0) {idx=0}
+    if ($2 !~ /^[-]/) {
       gsub( /'$i'/, "_", $2 );
       vname[indent] = $2;
-      idx=0;
-    } else {
-      indent = length($1) + 1;
+    } else if (length($2) == 1) {
+      indent += 1;
       vname[indent] = ("-")(idx);
-      $2 = (idx);
+      $2 = ("[")(idx)("]");
       idx++;
+      idxs[indent - 1] = idx;
+    } else {
+      indent += 1;
+      gsub( /^-*[[:space:]]*/, "", $2 );
+      vname[indent] = ("-")(idx)("'$sep'")($2);
+      $2 = ("[")(idx)("]'$sep'")($2);
+      idx++;
+      idxs[indent - 1] = ("")(idx);
     }
     for (i in vname) {if (i > indent) {delete vname[i]}}
     if (length($3) > 0) {
       vn="";
       for (i=0; i<indent; i++) {
-        if (length(vname[i]) > 0) {vn = (vn)(vname[i])("_")}
+        if (length(vname[i]) > 0) {vn = (vn)(vname[i])("'$sep'")}
       }
-      gsub( /_-([0-9]+)/, "[\1]", vn );
-      if (idx > 0) {
-        vn = substr(vn, 1, length(vn)-1);
-        printf("%s%s[%s]=\"%s\"\n", "'$prefix'", vn, $2, $3);
-      } else {
-        printf("%s%s%s=\"%s\"\n", "'$prefix'", vn, $2, $3);
-      }
+      gsub( /_-[0-9]+/, "[&]", vn );
+      gsub( /_-/, "", vn );
+      if (idx > 0) {vn = substr(vn, 1, length(vn)-1)}
+      printf("%s%s%s=\"%s\"\n", "'$prefix'", vn, $2, $3);
     }
   }'
 }
