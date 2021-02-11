@@ -94,3 +94,15 @@ file.size() {
     fi
   done
 }
+
+file.stream() {
+  # 指定されたファイルもしくは入力ストリームをストリームとして返します
+  # input-stream 入力ストリーム
+  # param1+ ファイルパス
+  # return ストリーム
+  if [ -t 0 ]; then
+    [[ "$#" -ne 0 ]] && cat "$@"
+  else
+    cat -
+  fi
+}
