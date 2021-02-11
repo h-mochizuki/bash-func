@@ -54,7 +54,7 @@ yml.toEnv() {
       vname[indent] = $2;
     } else if (length($2) == 1) {
       indent++;
-      vname[indent] = ("-")(idx);
+      vname[indent] = ("'$fs'")(idx);
       $2 = ("[")(idx)("]");
       idx++;
       idxs[indent - 1] = idx;
@@ -62,7 +62,7 @@ yml.toEnv() {
       gsub( /^-*[[:space:]]*/, "", $2 );
       gsub( /'$illegal'/, "_", $2 );
       indent++;
-      vname[indent] = ("-")(idx)("'$sep'")($2);
+      vname[indent] = ("'$fs'")(idx)("'$sep'")($2);
       $2 = ("[")(idx)("]'$sep'")($2);
       idx++;
       idxs[indent - 1] = idx;
@@ -73,8 +73,8 @@ yml.toEnv() {
       for (i=0; i<indent; i++) {
         if (length(vname[i]) > 0) {vn = (vn)(vname[i])("'$sep'")}
       }
-      gsub( /_-[0-9]+/, "[&]", vn );
-      gsub( /_-/, "", vn );
+      gsub( /_'$fs'[0-9]+/, "[&]", vn );
+      gsub( /_'$fs'/, "", vn );
       if (idx > 0) {vn = substr(vn, 1, length(vn)-1)}
       printf("%s%s%s=\"%s\"\n", "'$prefix'", vn, $2, $3);
     }
