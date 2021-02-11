@@ -54,14 +54,14 @@ yml.toEnv() {
     if (length($3) > 0) {
       vn="";
       for (i=0; i<indent; i++) {
-        if (length(vname[i]) == 0) {break}
-        vn=(vn)(vname[i])("_");
+        if (length(vname[i]) > 0) {vn = (vn)(vname[i])("_")}
       }
       gsub( /_-([0-9]+)/, "[\1]", vn );
       if (idx > 0) {
-        printf("%s%s[%s]=\"%s\"\n", "'$prefix'",substr(vn, 1, length(vn)-1), $2, $3);
+        vn = substr(vn, 1, length(vn)-1);
+        printf("%s%s[%s]=\"%s\"\n", "'$prefix'", vn, $2, $3);
       } else {
-        printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
+        printf("%s%s%s=\"%s\"\n", "'$prefix'", vn, $2, $3);
       }
     }
   }'
