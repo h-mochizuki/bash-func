@@ -244,10 +244,10 @@ EOS
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
-  [ "${output}" == '''Member[0].name=Sato
-Member[0].age=20
-Member[0].favalid[0]=Beer
-Member[1].name=Suzuki
-Member[1].age=25
-Member[1].favalid[0]=Wine''' ]
+  [ "${output}" == '''Member.0.name=Sato
+Member.0.age=20
+Member.0.favalid.0=Beer
+Member.1.name=Suzuki
+Member.1.age=25
+Member.1.favalid.0=Wine''' ]
 }

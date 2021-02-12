@@ -54,6 +54,8 @@ __yml.parse() {
   local separator=''
   local value_prefix=''
   local value_suffix=''
+  local index_prefix=''
+  local index_suffix=''
   local fs=$(echo @|tr @ '\034')
   for OPT in "$@"; do
     case "$OPT" in
@@ -65,38 +67,12 @@ __yml.parse() {
           shift 2
         fi
       };;
-      --illegal-chars) {
-        if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
-          shift
-        else
-          illegal="$2"
-          shift 2
-        fi
-      };;
-      --key-separator) {
-        if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
-          shift
-        else
-          separator="$2"
-          shift 2
-        fi
-      };;
-      --value-prefix) {
-        if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
-          shift
-        else
-          value_prefix="$2"
-          shift 2
-        fi
-      };;
-      --value-suffix) {
-        if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
-          shift
-        else
-          value_suffix="$2"
-          shift 2
-        fi
-      };;
+      --illegal-chars) illegal="$2"; shift 2;;
+      --key-separator) separator="$2"; shift 2;;
+      --value-prefix) value_prefix="$2"; shift 2;;
+      --value-suffix) value_suffix="$2"; shift 2;;
+      --index-prefix) index_prefix="$2"; shift 2;;
+      --index-suffix) index_suffix="$2"; shift 2;;
     esac
   done
   cat - | awk -F${fs} '{
@@ -120,7 +96,7 @@ __yml.parse() {
       for (i in vname) {if (i > indent + offset) {delete vname[i]}}
 
       vname[indent + offset] = ("'${fs}'")(idx);
-      $2 = ("[")(idx)("]");
+      $2 = ("'${index_prefix}'")(idx)("'${index_suffix}'");
       idxs[indent + offset] = ++idx;
     } else {
       # type: list + hash
@@ -135,7 +111,7 @@ __yml.parse() {
       if (length("'${illegal}'") > 0) {gsub( /'${illegal}'/, "'${separator}'", lstr)}
       vname[indent + list_offset] = ("'${fs}'")(idx);
       vname[indent + offset] = lstr;
-      $2 = ("[")(idx)("]'${separator}'")(lstr);
+      $2 = ("'${index_prefix}'")(idx)("'${index_suffix}'")("'${separator}'")(lstr);
       idxs[indent + list_offset] = ++idx;
       idxs[indent + offset] = 0;
       offset = 0;
@@ -145,7 +121,7 @@ __yml.parse() {
       for (i=0; i<indent + offset; i++) {
         if (length(vname[i]) > 0) {vn = (vn)(vname[i])("'${separator}'")}
       }
-      gsub( /'${separator}${fs}'[0-9]+/, "[&]", vn );
+      gsub( /'${separator}${fs}'[0-9]+/, "'${index_prefix}'&'${index_suffix}'", vn );
       gsub( /'${separator}${fs}'/, "", vn );
       if (idx > 0) {vn = substr(vn, 1, length(vn)-1)}
       printf("%s%s%s='$value_prefix'%s'$value_suffix'\n", "'${prefix}'", vn, $2, $3);
@@ -165,10 +141,12 @@ yml.toEnv() {
   [ -t 0 ] && prefix="$2"
   __yml.stream "$@" | \
   __yml.parse \
-    --illegal-chars '[\.-]' \
+    --illegal-chars '[\\.-]' \
     --key-separator '_' \
     --value-prefix '\"' \
     --value-suffix '\"' \
+    --index-prefix '[' \
+    --index-suffix ']' \
     --prefix "${prefix}"
 }
 
@@ -186,5 +164,6 @@ yml.toProperties() {
   __yml.parse \
     --illegal-chars '[=]' \
     --key-separator '.' \
+    --index-prefix '.' \
     --prefix "${prefix}"
 }
