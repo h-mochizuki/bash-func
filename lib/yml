@@ -6,23 +6,15 @@
 # ----------------
 #     関数定義
 # ----------------
-yml.toEnv() {
-  # YAMLを環境変数として使用できる形に変換します
-  # 環境変数のキーにドットやハイフンは使用できないため
-  # それらが使用されていた場合アンダースコアに変更されます
+__yml.stream() {
+  # YAMLをインデント/キー/バリューで区切ったストリームを返します
   # input-stream 入力ストリーム
   # param1 入力ファイル
-  # param2 追加接頭語
-  # return 環境変数で使用できるようにしたYAML内容
-  # returnCd 0:変換できた 1:変換できなかった
-  local prefix="$1"
-  [ -t 0 ] && prefix="$2"
+  # return YAMLをインデント/キー/バリューで区切ったストリーム
   local s='[[:space:]]*'
   local c='[[:space:]]\+#.*'
   local w='[a-zA-Z0-9_]*[a-zA-Z0-9_\.-]*'
   local l='[-]'
-  local illegal='[\.-]'
-  local sep='_'
   local fs=$(echo @|tr @ '\034')
   if [ -t 0 ]; then
     [[ "$#" -ne 0 ]] && cat "$1"
@@ -40,8 +32,74 @@ yml.toEnv() {
        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$c\$|\1$fs\2$fs\3|p" \
        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
        -e "s|^\($s\)\($w\)$s:$s\(\([^[:space:]][^#]\)\+\)$c\$|\1$fs\2$fs\3|p" \
-       -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" | \
-  awk -F$fs '{
+       -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"
+}
+
+__yml.parse() {
+  # インデント/キー/バリューで区切られたストリームを解析し
+  # 指定されたフォーマットで出力します
+  # input-stream 入力ストリーム
+  # param1+ 入力オプション
+  # return 解析結果
+  # ----
+  # オプション
+  #   --prefix        : キーにつける接頭語
+  #   --illegal-chars : キーに使用できない不正な文字列
+  #   --key-separator : キーを分割するセパレータ（不正文字列もこれで置換されます）
+  #   --value-prefix  : バリューの接頭語
+  #   --value-suffix  : バリューの接尾語
+  local OPT
+  local prefix=''
+  local illegal=''
+  local separator=''
+  local value_prefix=''
+  local value_suffix=''
+  local fs=$(echo @|tr @ '\034')
+  for OPT in "$@"; do
+    case "$OPT" in
+      --prefix) {
+        if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+          shift
+        else
+          prefix="$2"
+          shift 2
+        fi
+      };;
+      --illegal-chars) {
+        if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+          shift
+        else
+          illegal="$2"
+          shift 2
+        fi
+      };;
+      --key-separator) {
+        if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+          shift
+        else
+          separator="$2"
+          shift 2
+        fi
+      };;
+      --value-prefix) {
+        if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+          shift
+        else
+          value_prefix="$2"
+          shift 2
+        fi
+      };;
+      --value-suffix) {
+        if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+          shift
+        else
+          value_suffix="$2"
+          shift 2
+        fi
+      };;
+    esac
+  done
+  cat - | awk -F${fs} '{
     indent = length($1);
     if ($2 !~ /^[-]/) {
       # type: hash
@@ -51,7 +109,7 @@ yml.toEnv() {
       for (i in idxs) {if (i > indent + offset) {delete idxs[i]}}
       for (i in vname) {if (i > indent + offset) {delete vname[i]}}
 
-      gsub( /'$illegal'/, "_", $2 );
+      if (length("'${illegal}'") > 0) {gsub( /'${illegal}'/, "'${separator}'", $2)}
       vname[indent + offset] = $2;
     } else if (length($2) == 1) {
       # type: list
@@ -61,7 +119,7 @@ yml.toEnv() {
       for (i in idxs) {if (i > indent + offset) {delete idxs[i]}}
       for (i in vname) {if (i > indent + offset) {delete vname[i]}}
 
-      vname[indent + offset] = ("'$fs'")(idx);
+      vname[indent + offset] = ("'${fs}'")(idx);
       $2 = ("[")(idx)("]");
       idxs[indent + offset] = ++idx;
     } else {
@@ -74,10 +132,10 @@ yml.toEnv() {
       for (i in vname) {if (i > indent + offset) {delete vname[i]}}
 
       lstr = substr($2, offset + 1, length($2) - offset)
-      gsub( /'$illegal'/, "_", lstr);
-      vname[indent + list_offset] = ("'$fs'")(idx);
+      if (length("'${illegal}'") > 0) {gsub( /'${illegal}'/, "'${separator}'", lstr)}
+      vname[indent + list_offset] = ("'${fs}'")(idx);
       vname[indent + offset] = lstr;
-      $2 = ("[")(idx)("]'$sep'")(lstr);
+      $2 = ("[")(idx)("]'${separator}'")(lstr);
       idxs[indent + list_offset] = ++idx;
       idxs[indent + offset] = 0;
       offset = 0;
@@ -85,12 +143,48 @@ yml.toEnv() {
     if (length($3) > 0) {
       vn="";
       for (i=0; i<indent + offset; i++) {
-        if (length(vname[i]) > 0) {vn = (vn)(vname[i])("'$sep'")}
+        if (length(vname[i]) > 0) {vn = (vn)(vname[i])("'${separator}'")}
       }
-      gsub( /_'$fs'[0-9]+/, "[&]", vn );
-      gsub( /_'$fs'/, "", vn );
+      gsub( /'${separator}${fs}'[0-9]+/, "[&]", vn );
+      gsub( /'${separator}${fs}'/, "", vn );
       if (idx > 0) {vn = substr(vn, 1, length(vn)-1)}
-      printf("%s%s%s=\"%s\"\n", "'$prefix'", vn, $2, $3);
+      printf("%s%s%s='$value_prefix'%s'$value_suffix'\n", "'${prefix}'", vn, $2, $3);
     }
   }'
+}
+
+yml.toEnv() {
+  # YAMLを環境変数方式に変換します
+  # 環境変数のキーにドットやハイフンは使用できないため
+  # それらが使用されていた場合アンダースコアに変更されます
+  # input-stream 入力ストリーム
+  # param1 入力ファイル
+  # param2 追加接頭語
+  # return 環境変数方式のYAML内容
+  local prefix="$1"
+  [ -t 0 ] && prefix="$2"
+  __yml.stream "$@" | \
+  __yml.parse \
+    --illegal-chars '[\.-]' \
+    --key-separator '_' \
+    --value-prefix '\"' \
+    --value-suffix '\"' \
+    --prefix "${prefix}"
+}
+
+yml.toProperties() {
+  # YAMLをpropertiesファイル形式に変換します
+  # propertyのキーにイコールは使用できないため
+  # 使用されていた場合はドットに変更されます
+  # input-stream 入力ストリーム
+  # param1 入力ファイル
+  # param2 追加接頭語
+  # return propertiesファイル形式に変換したYAML内容
+  local prefix="$1"
+  [ -t 0 ] && prefix="$2"
+  __yml.stream "$@" | \
+  __yml.parse \
+    --illegal-chars '[=]' \
+    --key-separator '.' \
+    --prefix "${prefix}"
 }

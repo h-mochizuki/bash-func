@@ -78,6 +78,26 @@ EOS
   [ "${output}" == 'key="value"' ]
 }
 
+@test "yml.toEnv : dot key" {
+  run yml.toEnv <<EOS
+key.1: value
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'key_1="value"' ]
+}
+
+@test "yml.toEnv : hyphen key" {
+  run yml.toEnv <<EOS
+key-1: value
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'key_1="value"' ]
+}
+
 @test "yml.toEnv : quoted value" {
   run yml.toEnv <<EOS
 key: "value"
@@ -179,4 +199,55 @@ Member[0]_favalid[0]="Beer"
 Member[1]_name="Suzuki"
 Member[1]_age="25"
 Member[1]_favalid[0]="Wine"''' ]
+}
+
+@test "yml.toProperties : empty" {
+  run yml.toProperties
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "yml.toProperties : simple value" {
+  run yml.toProperties <<EOS
+key: value
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'key=value' ]
+}
+
+@test "yml.toProperties : dot key" {
+  run yml.toProperties <<EOS
+key.1: value
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'key.1=value' ]
+}
+
+@test "yml.toProperties : complex array" {
+  run yml.toProperties <<EOS
+Member:
+  - name: Sato
+    age: 20
+    favalid:
+      - Beer
+  - name: Suzuki
+    age: 25
+    favalid:
+      - Wine
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '''Member[0].name=Sato
+Member[0].age=20
+Member[0].favalid[0]=Beer
+Member[1].name=Suzuki
+Member[1].age=25
+Member[1].favalid[0]=Wine''' ]
 }
