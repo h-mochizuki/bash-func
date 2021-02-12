@@ -135,7 +135,7 @@ children[2]="Michael"
 neverland_children[0]="Peter Pan"''' ]
 }
 
-@test "yml.toEnv : complex array" {
+@test "yml.toEnv : nested array" {
   run yml.toEnv <<EOS
 Children:
   - London:
@@ -156,4 +156,21 @@ Children[0]_London[1]="Jhon"
 Children[0]_London[2]="Michael"
 Children[1]_Neverland[0]="Peter Pan"
 Pirates[0]_Neverland[0]="Captain Hook"''' ]
+}
+
+@test "yml.toEnv : complex array" {
+  run yml.toEnv <<EOS
+Member:
+  - name: Sato
+    age: 20
+  - name: Suzuki
+    age: 25
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '''Member[0]_name="Sato"
+Member[0]_age="20"
+Member[1]_name="Suzuki"
+Member[1]_age="25"''' ]
 }

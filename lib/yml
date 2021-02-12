@@ -43,31 +43,41 @@ yml.toEnv() {
        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" | \
   awk -F$fs 'BEGIN {
       idx=0;
-      idxs[0]=0;
     } {
     indent = length($1);
-    for (i in idxs) {if (i > indent) {delete idxs[i]}}
-    idx = idxs[indent];
+    idx = indxs[indent];
     if (length(idx) == 0) {idx=0}
     if ($2 !~ /^[-]/) {
+      for (i in indxs) {if (i > indent) {delete indxs[i]}}
       gsub( /'$illegal'/, "_", $2 );
       vname[indent] = $2;
+      for (i in vname) {if (i > indent) {delete vname[i]}}
     } else if (length($2) == 1) {
-      indent++;
+      indent = indent + 1;
+      idx = indxs[indent];
+      if (length(idx) == 0) {idx=0}
+      for (i in indxs) {if (i > indent) {delete indxs[i]}}
+
       vname[indent] = ("'$fs'")(idx);
       $2 = ("[")(idx)("]");
-      idx++;
-      idxs[indent - 1] = idx;
+      indxs[indent] = ++idx;
+      for (i in vname) {if (i > indent) {delete vname[i]}}
     } else {
-      gsub( /^-*[[:space:]]*/, "", $2 );
-      gsub( /'$illegal'/, "_", $2 );
-      indent++;
-      vname[indent] = ("'$fs'")(idx)("'$sep'")($2);
-      $2 = ("[")(idx)("]'$sep'")($2);
-      idx++;
-      idxs[indent - 1] = idx;
+      aindent = match(substr($2, 2, length($2)-1), /[^[:space:]]/);
+      lstr = substr($2, aindent + 1, length($2)-aindent)
+      for (i in indxs) {if (i > indent + aindent) {delete indxs[i]}}
+      idx = indxs[indent + 1];
+      if (length(idx) == 0) {idx=0}
+      for (i in indxs) {if (i > indent) {delete indxs[i]}}
+
+      gsub( /'$illegal'/, "_", lstr);
+      vname[indent + 1] = ("'$fs'")(idx);
+      vname[indent + aindent] = lstr;
+      $2 = ("[")(idx)("]'$sep'")(lstr);
+      indxs[indent + 1] = ++idx;
+      indxs[indent + aindent] = 0;
+      for (i in vname) {if (i > indent + aindent) {delete vname[i]}}
     }
-    for (i in vname) {if (i > indent) {delete vname[i]}}
     if (length($3) > 0) {
       vn="";
       for (i=0; i<indent; i++) {
