@@ -163,14 +163,20 @@ Pirates[0]_Neverland[0]="Captain Hook"''' ]
 Member:
   - name: Sato
     age: 20
+    favalid:
+      - Beer
   - name: Suzuki
     age: 25
+    favalid:
+      - Wine
 EOS
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
   [ "${output}" == '''Member[0]_name="Sato"
 Member[0]_age="20"
+Member[0]_favalid[0]="Beer"
 Member[1]_name="Suzuki"
-Member[1]_age="25"''' ]
+Member[1]_age="25"
+Member[1]_favalid[0]="Wine"''' ]
 }
