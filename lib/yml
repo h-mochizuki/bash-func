@@ -41,46 +41,50 @@ yml.toEnv() {
        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
        -e "s|^\($s\)\($w\)$s:$s\(\([^[:space:]][^#]\)\+\)$c\$|\1$fs\2$fs\3|p" \
        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" | \
-  awk -F$fs 'BEGIN {
-      idx=0;
-    } {
+  awk -F$fs '{
     indent = length($1);
-    idx = indxs[indent];
-    if (length(idx) == 0) {idx=0}
     if ($2 !~ /^[-]/) {
-      for (i in indxs) {if (i > indent) {delete indxs[i]}}
+      # type: hash
+      offset = 0;
+      idx = idxs[indent + offset];
+      if (length(idx) == 0) {idx=0}
+      for (i in idxs) {if (i > indent + offset) {delete idxs[i]}}
+      for (i in vname) {if (i > indent + offset) {delete vname[i]}}
+
       gsub( /'$illegal'/, "_", $2 );
-      vname[indent] = $2;
-      for (i in vname) {if (i > indent) {delete vname[i]}}
+      vname[indent + offset] = $2;
     } else if (length($2) == 1) {
-      indent = indent + 1;
-      idx = indxs[indent];
+      # type: list
+      offset = 1;
+      idx = idxs[indent + offset];
       if (length(idx) == 0) {idx=0}
-      for (i in indxs) {if (i > indent) {delete indxs[i]}}
+      for (i in idxs) {if (i > indent + offset) {delete idxs[i]}}
+      for (i in vname) {if (i > indent + offset) {delete vname[i]}}
 
-      vname[indent] = ("'$fs'")(idx);
+      vname[indent + offset] = ("'$fs'")(idx);
       $2 = ("[")(idx)("]");
-      indxs[indent] = ++idx;
-      for (i in vname) {if (i > indent) {delete vname[i]}}
+      idxs[indent + offset] = ++idx;
     } else {
-      aindent = match(substr($2, 2, length($2)-1), /[^[:space:]]/);
-      lstr = substr($2, aindent + 1, length($2)-aindent)
-      for (i in indxs) {if (i > indent + aindent) {delete indxs[i]}}
-      idx = indxs[indent + 1];
+      # type: list + hash
+      list_offset = 1;
+      idx = idxs[indent + list_offset];
       if (length(idx) == 0) {idx=0}
-      for (i in indxs) {if (i > indent) {delete indxs[i]}}
+      offset = match(substr($2, 2, length($2) - 1), /[^[:space:]]/);
+      for (i in idxs) {if (i > indent + offset) {delete idxs[i]}}
+      for (i in vname) {if (i > indent + offset) {delete vname[i]}}
 
+      lstr = substr($2, offset + 1, length($2) - offset)
       gsub( /'$illegal'/, "_", lstr);
-      vname[indent + 1] = ("'$fs'")(idx);
-      vname[indent + aindent] = lstr;
+      vname[indent + list_offset] = ("'$fs'")(idx);
+      vname[indent + offset] = lstr;
       $2 = ("[")(idx)("]'$sep'")(lstr);
-      indxs[indent + 1] = ++idx;
-      indxs[indent + aindent] = 0;
-      for (i in vname) {if (i > indent + aindent) {delete vname[i]}}
+      idxs[indent + list_offset] = ++idx;
+      idxs[indent + offset] = 0;
+      offset = 0;
     }
     if (length($3) > 0) {
       vn="";
-      for (i=0; i<indent; i++) {
+      for (i=0; i<indent + offset; i++) {
         if (length(vname[i]) > 0) {vn = (vn)(vname[i])("'$sep'")}
       }
       gsub( /_'$fs'[0-9]+/, "[&]", vn );
