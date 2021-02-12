@@ -47,7 +47,9 @@ __yml.parse() {
   #   --illegal-chars : キーに使用できない不正な文字列
   #   --key-separator : キーを分割するセパレータ（不正文字列もこれで置換されます）
   #   --value-prefix  : バリューの接頭語
-  #   --value-suffix  : バリューの接尾語
+  #   --value-suffix  : バリューの接尾辞
+  #   --index-prefix  : 配列インデックスの接頭語
+  #   --index-suffix  : 配列インデックスの接尾辞
   local OPT
   local prefix=''
   local illegal=''
