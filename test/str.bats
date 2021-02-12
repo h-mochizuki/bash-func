@@ -240,7 +240,7 @@ setup() {
 }
 
 @test "str.evalstr : text" {
-  run str.evalstr <<<'abcdefg'
+  run str.evalstr 'abcdefg'
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
@@ -249,7 +249,7 @@ setup() {
 
 @test "str.evalstr : variable" {
   VAR_TEST='12345'
-  run str.evalstr <<<'${VAR_TEST}'
+  run str.evalstr '${VAR_TEST}'
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
@@ -257,7 +257,7 @@ setup() {
 }
 
 @test "str.evalstr : script" {
-  run str.evalstr <<<'$(echo "abcdefg")'
+  run str.evalstr '$(echo "abcdefg")'
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
@@ -266,7 +266,64 @@ setup() {
 
 @test "str.evalstr : complex" {
   VAR_TEST='54321'
-  run str.evalstr <<<'''\
+  run str.evalstr '''\
+12345
+${VAR_TEST}
+
+$(echo "abcdefg")
+$(
+  for i in 6 7 8 9 0; do
+    echo -n "$i"
+  done
+)
+'''
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == """\
+12345
+54321
+
+abcdefg
+67890""" ]
+}
+
+@test "str.evalfile : empty" {
+  run str.evalfile
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "str.evalfile : text" {
+  run str.evalfile <<<'abcdefg'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'abcdefg' ]
+}
+
+@test "str.evalfile : variable" {
+  VAR_TEST='12345'
+  run str.evalfile <<<'${VAR_TEST}'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '12345' ]
+}
+
+@test "str.evalfile : script" {
+  run str.evalfile <<<'$(echo "abcdefg")'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'abcdefg' ]
+}
+
+@test "str.evalfile : complex" {
+  VAR_TEST='54321'
+  run str.evalfile <<<'''\
 12345
 ${VAR_TEST}
 

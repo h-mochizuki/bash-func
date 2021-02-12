@@ -201,6 +201,14 @@ str.times() {
 }
 
 str.evalstr() {
+  # 入力内容に含まれる環境変数やスクリプトを評価した文字列を返します
+  # input-stream 入力ストリーム
+  # param1+ 対象文字列
+  # return 環境変数やスクリプトを評価した文字列
+  str.stream "$@" | eval "echo -e \"$(cat)\""
+}
+
+str.evalfile() {
   # ファイルに含まれる環境変数やスクリプトを評価した文字列を返します
   # input-stream 入力ストリーム
   # param1+ ファイルパス
