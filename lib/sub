@@ -3,19 +3,44 @@
 #        サブプロンプト関数定義
 # =====================================
 base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
+source "${base}/file"
 
 # ----------------
 #     関数定義
 # ----------------
 sub.new() {
-  # サブプロンプトを開始します
+  # 設定ファイルを読み込んでサブプロンプトを開始します
+  # 設定ファイルは親フォルダを遡って探索されます
+  # 設定ファイルが見つからない場合、カレントディレクトリにファイルを作成します
+  # param1 設定ファイル名（デフォルト: .subrc）
+  local initfile="${1:-.subrc}"
+  (
+    local ifile="$(file.hasBelonged ${initfile})"
+    [[ "x${ifile}" == "x" ]] && {
+      ifile="$(pwd)/$(basename ${initfile})"
+      cat >${ifile} <<EOF
+#!/bin/bash --init-file
+PS1="\[\033[01;34m\]\u\[\033[00m\]\$ "
+EOF
+      echo "${initfile} is not found."
+      echo "created init-file: ${ifile}"
+    }
+    bash --init-file ${ifile}
+  )
+}
+
+sub.temp() {
+  # 使い捨てのサブプロンプト環境を開始します
+  local initfile="${1:-.subrc}"
+  initfile="$(file.hasBelonged ${initfile})"
   (
     unset tmpfile
     trap '[[ "${tmpfile}" ]] && rm -f ${tmpfile}' EXIT HUP INT QUIT TERM RETURN
     local tmpfile=$(mktemp 2>/dev/null||mktemp -t tmp)
-    cat >${tmpfile} <<<'''#!/bin/bash --init-file
-      PS1="\[\033[01;34m\]\u\[\033[00m\]\$ "
-    '''
+    cat >${tmpfile} <<EOF
+#!/bin/bash --init-file
+PS1="\[\033[01;34m\]\u\[\033[00m\]\$ "
+EOF
     bash --init-file ${tmpfile}
   )
 }
