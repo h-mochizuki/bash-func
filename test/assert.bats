@@ -75,3 +75,51 @@ setup() {
   [ "$status" -eq 1 ]
   [ "${output}" == '[ERROR]!!FAILED!! -exec-> false ' ]
 }
+
+@test "assert.yn : empty" {
+  run assert.yn <<<''
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+  [ "${output}" == '' ]
+}
+
+@test "assert.yn y" {
+  run assert.yn <<<'y'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "assert.yn yes" {
+  run assert.yn <<<'yes'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "assert.yn Yes" {
+  run assert.yn <<<'Yes'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "assert.yn n" {
+  run assert.yn <<<'n'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+  [ "${output}" == '' ]
+}
+
+@test "assert.yn other" {
+  run assert.yn <<<'other'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+  [ "${output}" == '' ]
+}

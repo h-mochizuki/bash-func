@@ -187,3 +187,17 @@ assert.lock() {
   __assert.__lock "${timeout:-10}" "${lockfile}" || exit
   trap "assert.unlock '${lockfile}'" EXIT HUP INT QUIT TERM
 }
+
+assert.yn() {
+  # 質問を表示し、Yes or No で回答させます
+  # param1 質問文
+  # returnCd 0:Yes 1:No
+  local yn
+  read -p "${1:-Are you sure?}[y/N]: " yn>&2
+  case "${yn}" in
+    [yY]* )
+      return 0;;
+    *)
+      return 1;;
+  esac
+}
