@@ -115,7 +115,7 @@ file.hasBelonged() {
   [[ "$#" -eq 0 ]] && return 1
   local target="${1}"
   local cur="$(pwd)"
-  while [ ! "${cur}" = "/" ];do
+  while [[ ! "${cur}" = "/" ]];do
     [[ -e "${cur}/${target}" ]] && {
       echo "${cur}/${target}"
       return 0
