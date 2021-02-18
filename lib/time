@@ -22,16 +22,19 @@ time.elapsed() {
 
   # 実行前準備
   local allArgs="$*"
-  local cmd="${1:-echo}";shift
+  local cmd="${1:-echo -n}";shift
   local args=( "$@" )
   local startTimestamp=$(date +%s%N)
 
   # 処理
-  local result=$("$cmd" "${args[@]}"; echo "$?")
+  (
+    ${cmd} "${args[@]}"
+  )
+  local result=$?
 
   # 実行時間計算
   local endTimestamp=$(date +%s%N)
-  local elapsedTime=$(( $endTimestamp - $startTimestamp ))
+  local elapsedTime=$(( ${endTimestamp} - ${startTimestamp} ))
   if [[ ${#elapsedTime} -le 10 ]];then
     elapsedTime="000000000${elapsedTime}"
   fi
@@ -40,7 +43,7 @@ time.elapsed() {
 
   # 実行時間表示
   time.diffTimestamp "${sec}.${underSec}" 0 "${ELAPSED_FORMAT:-'[elapsed %-Ss]'}"
-  return "$result"
+  return "${result}"
 }
 
 time.diffTimestamp() {

@@ -41,6 +41,14 @@ setup() {
   [ "${output}" == '[elapsed 2 sec]' ]
 }
 
+@test "time.elapsed : echo -n 'piyo' -> [elapsed 0 sec]" {
+  run time.elapsed echo -n 'piyo'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'piyo[elapsed 0 sec]' ]
+}
+
 @test "time.diffTimestamp : 0 ~ 0 -> 0s" {
   run time.diffTimestamp 0 0
   echo "status: ${status}"
