@@ -106,3 +106,21 @@ file.stream() {
     cat -
   fi
 }
+
+file.hasBelonged() {
+  # ディレクトリを遡り、対象ファイルがあるかを返します
+  # param1 検索対象ファイル
+  # return 対象ファイルパス
+  # returnCd 0:ファイルがあった 1: ファイルがなかった
+  [[ "$#" -eq 0 ]] && return 1
+  local target="${1}"
+  local cur="$(pwd)"
+  while [ ! "${cur}" = "/" ];do
+    [[ -e "${cur}/${target}" ]] && {
+      echo "${cur}/${target}"
+      return 0
+    }
+    cur="$(dirname ${cur})"
+  done
+  return 1
+}

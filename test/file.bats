@@ -41,3 +41,38 @@ teardown() {
   echo "output: ${output}"
   [ "$status" -eq 1 ]
 }
+
+@test "file.hasBelonged : empty" {
+  run file.hasBelonged
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+  [ "${output}" == '' ]
+}
+
+@test "file.hasBelonged : not found" {
+  run file.hasBelonged "hogehogepiyopiyo"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+  [ "${output}" == '' ]
+}
+
+@test "file.hasBelonged file.bats" {
+  pushd "${BATS_TEST_DIRNAME}"
+  run file.hasBelonged "file.bats"
+  popd
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "${BATS_TEST_DIRNAME}/file.bats" ]
+}
+
+@test "file.hasBelonged $(basename ${BATS_TEST_DIRNAME})" {
+  parent="$(basename ${BATS_TEST_DIRNAME})"
+  run file.hasBelonged "${parent}"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "${BATS_TEST_DIRNAME}" ]
+}
