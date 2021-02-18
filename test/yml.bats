@@ -234,11 +234,12 @@ EOS
 Member:
   - name: Sato
     age: 20
-    favalid:
+    favorite:
+      - Sake
       - Beer
   - name: Suzuki
     age: 25
-    favalid:
+    favorite:
       - Wine
 EOS
   echo "status: ${status}"
@@ -246,8 +247,9 @@ EOS
   [ "$status" -eq 0 ]
   [ "${output}" == '''Member.0.name=Sato
 Member.0.age=20
-Member.0.favalid.0=Beer
+Member.0.favorite.0=Sake
+Member.0.favorite.1=Beer
 Member.1.name=Suzuki
 Member.1.age=25
-Member.1.favalid.0=Wine''' ]
+Member.1.favorite.0=Wine''' ]
 }
