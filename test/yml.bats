@@ -253,3 +253,31 @@ Member.1.name=Suzuki
 Member.1.age=25
 Member.1.favorite.0=Wine''' ]
 }
+
+@test "yml.grep : empty" {
+  run yml.grep
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "yml.grep : list" {
+  run yml.grep name <<EOS
+Member:
+  - name: Sato
+    age: 20
+    favorite:
+      - Sake
+      - Beer
+  - name: Suzuki
+    age: 25
+    favorite:
+      - Wine
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '''Member.0.name=Sato
+Member.1.name=Suzuki''' ]
+}
