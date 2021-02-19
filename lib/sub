@@ -21,6 +21,7 @@ sub.new() {
       cat >${ifile} <<EOF
 #!/bin/bash --init-file
 PS1="\[\033[01;34m\]\u\[\033[00m\]\$ "
+[[ -d "${base}" ]] && for f in \$(find "${base}" -type f);do source "\${f}"; done
 EOF
       echo "${initfile} is not found."
       echo "created init-file: ${ifile}"
@@ -40,6 +41,7 @@ sub.temp() {
     cat >${tmpfile} <<EOF
 #!/bin/bash --init-file
 PS1="\[\033[01;34m\]\u\[\033[00m\]\$ "
+[[ -d "${base}" ]] && for f in \$(find "${base}" -type f);do source "\${f}"; done
 EOF
     bash --init-file ${tmpfile}
   )
