@@ -33,7 +33,7 @@ arr.join() {
   local elements=( "$@" )
   local str="${elements[0]}"
   for s in "${elements[@]:1}";do
-    str="${str}${delimiter}${s}"
+    str+="${delimiter}${s}"
   done
   echo "${prefix}${str}${suffix}"
 }
