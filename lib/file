@@ -107,7 +107,7 @@ file.stream() {
   fi
 }
 
-file.hasBelonged() {
+file.isBelongedTo() {
   # ディレクトリを遡り、対象ファイルがあるかを返します
   # param1 検索対象ファイル
   # return 対象ファイルパス

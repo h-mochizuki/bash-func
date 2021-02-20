@@ -15,7 +15,7 @@ sub.new() {
   # param1 設定ファイル名（デフォルト: .subrc）
   local initfile="${1:-.subrc}"
   (
-    local ifile="$(file.hasBelonged ${initfile})"
+    local ifile="$(file.isBelongedTo ${initfile})"
     [[ "x${ifile}" == "x" ]] && {
       ifile="$(pwd)/$(basename ${initfile})"
       cat >${ifile} <<EOF
@@ -33,7 +33,7 @@ EOF
 sub.temp() {
   # 使い捨てのサブプロンプト環境を開始します
   local initfile="${1:-.subrc}"
-  initfile="$(file.hasBelonged ${initfile})"
+  initfile="$(file.isBelongedTo ${initfile})"
   (
     unset tmpfile
     trap '[[ "${tmpfile}" ]] && rm -f ${tmpfile}' EXIT HUP INT QUIT TERM RETURN

@@ -42,25 +42,25 @@ teardown() {
   [ "$status" -eq 1 ]
 }
 
-@test "file.hasBelonged : empty" {
-  run file.hasBelonged
+@test "file.isBelongedTo : empty" {
+  run file.isBelongedTo
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 1 ]
   [ "${output}" == '' ]
 }
 
-@test "file.hasBelonged : not found" {
-  run file.hasBelonged "hogehogepiyopiyo"
+@test "file.isBelongedTo : not found" {
+  run file.isBelongedTo "hogehogepiyopiyo"
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 1 ]
   [ "${output}" == '' ]
 }
 
-@test "file.hasBelonged file.bats" {
+@test "file.isBelongedTo file.bats" {
   pushd "${BATS_TEST_DIRNAME}"
-  run file.hasBelonged "file.bats"
+  run file.isBelongedTo "file.bats"
   popd
   echo "status: ${status}"
   echo "output: ${output}"
@@ -68,9 +68,9 @@ teardown() {
   [ "${output}" == "${BATS_TEST_DIRNAME}/file.bats" ]
 }
 
-@test "file.hasBelonged $(basename ${BATS_TEST_DIRNAME})" {
+@test "file.isBelongedTo $(basename ${BATS_TEST_DIRNAME})" {
   parent="$(basename ${BATS_TEST_DIRNAME})"
-  run file.hasBelonged "${parent}"
+  run file.isBelongedTo "${parent}"
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
