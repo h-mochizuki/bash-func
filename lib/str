@@ -226,7 +226,6 @@ str.initial() {
   # 頭文字を返します
   # input-stream 入力ストリーム
   # param1+ 対象文字列
-  # str.stream "$@" | sed -e 's/^\(.\).*$/\1/'
   if [ -t 0 ]; then
     if [ "$#" -ne 0 ]; then
       for arg in "$@"; do
