@@ -178,13 +178,13 @@ yml.grep() {
   # param1 入力ファイル
   # param2 検索文字列
   # return propertiesファイル形式に変換したYAML内容の検索結果
-  local target="$1"
-  [[ -t 0 ]] && target="$2"
-  [[ -z "$target" ]] && return 0
+  [[ -t 0 ]] && shift
+  local params="$@"
+  [[ -z "$params" ]] && return 0
   __yml.stream "$@" | \
   __yml.parse \
     --illegal-chars '[=]' \
     --key-separator '.' \
     --index-prefix '.' | \
-  grep ${target}
+  grep ${params}
 }
