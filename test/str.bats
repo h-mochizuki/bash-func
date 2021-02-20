@@ -100,6 +100,14 @@ setup() {
   [ "$status" -eq 0 ]
 }
 
+@test "str.toLower : empty" {
+  run str.toLower
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
 @test "str.toLower : HOGEhoge => hogehoge" {
   run str.toLower "HOGEhoge"
   echo "status: ${status}"
@@ -343,4 +351,45 @@ $(
 
 abcdefg
 67890""" ]
+}
+
+@test "str.initial : empty" {
+  run str.initial
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "str.initial : 'a' -> 'a'" {
+  run str.initial 'a'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'a' ]
+}
+
+@test "str.initial : 'abcdefg' -> 'a'" {
+  run str.initial 'abcdefg'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'a' ]
+}
+
+@test "str.initial : 'ab' 'cd' -> 'a' 'c'" {
+  run str.initial 'ab' 'cd'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '''a
+c''' ]
+}
+
+@test "str.initial : 'ab   cd' -> 'a'" {
+  run str.initial 'ab   cd'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'a' ]
 }

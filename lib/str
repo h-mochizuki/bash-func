@@ -85,7 +85,9 @@ str.stream() {
   # param1+ 入力引数
   # return ストリーム
   if [ -t 0 ]; then
-    [[ "$#" -ne 0 ]] &&  echo "$@"
+    if [ "$#" -ne 0 ];then
+      echo "$@"
+    fi
   else
     cat -
   fi
@@ -203,7 +205,7 @@ str.times() {
 str.evalstr() {
   # 入力内容に含まれる環境変数やスクリプトを評価した文字列を返します
   # input-stream 入力ストリーム
-  # param1+ 対象文字列
+  # param1 対象文字列
   # return 環境変数やスクリプトを評価した文字列
   str.stream "$@" | eval "echo -e \"$(cat)\""
 }
@@ -211,11 +213,27 @@ str.evalstr() {
 str.evalfile() {
   # ファイルに含まれる環境変数やスクリプトを評価した文字列を返します
   # input-stream 入力ストリーム
-  # param1+ ファイルパス
+  # param1 ファイルパス
   # return 環境変数やスクリプトを評価した文字列
   if [ -t 0 ]; then
     [[ "$#" -ne 0 ]] && cat "$1"
   else
     cat -
   fi | eval "echo -e \"$(cat)\""
+}
+
+str.initial() {
+  # 頭文字を返します
+  # input-stream 入力ストリーム
+  # param1+ 対象文字列
+  # str.stream "$@" | sed -e 's/^\(.\).*$/\1/'
+  if [ -t 0 ]; then
+    if [ "$#" -ne 0 ]; then
+      for arg in "$@"; do
+        echo "$arg" | sed -e 's/^\(.\).*$/\1/'
+      done
+    fi
+  else
+    cat - | sed -e 's/^\(.\).*$/\1/'
+  fi
 }
