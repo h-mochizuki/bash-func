@@ -251,3 +251,16 @@ str.trim() {
     cat - | sed -e 's/^\s*//' -e 's/\s*$//'
   fi
 }
+
+str.take() {
+  # 指定文字数分を切り出します
+  # input-stream 入力ストリーム
+  # param1 指定文字数（負数で末尾から）
+  # param2+ 対象文字列
+  str.isInteger "$1" >/dev/null 2>&1
+  [[ "$?" -ne 0 ]] && str.stream "$@" && return 1
+  local justified="^\(.\{${1#-}\}\).*"
+  [[ "${1%%[0-9]*}" == "-" ]] && justified=".*\(.\{${1#-}\}\)$"
+  shift
+  str.stream "$@" | sed -e "s/${justified}/\1/"
+}

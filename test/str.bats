@@ -433,3 +433,51 @@ c''' ]
   [ "$status" -eq 0 ]
   [ "${output}" == 'a  b' ]
 }
+
+@test "str.take : empty args" {
+  run str.take
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+  [ "${output}" == '' ]
+}
+
+@test "str.take : arg is not number" {
+  run str.take "na"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+  [ "${output}" == 'na' ]
+}
+
+@test "str.take : empty string" {
+  run str.take 5
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "str.take 5 : '1234567890' -> '12345'" {
+  run str.take 5 '1234567890'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '12345' ]
+}
+
+@test "str.take -5 : '1234567890' -> '67890'" {
+  run str.take -5 '1234567890'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '67890' ]
+}
+
+@test "str.take 0 : '1234567890' -> ''" {
+  run str.take 0 '1234567890'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
