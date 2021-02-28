@@ -236,3 +236,18 @@ str.initial() {
     cat - | sed -e 's/^\(.\).*$/\1/'
   fi
 }
+
+str.trim() {
+  # 前後の空白を除去します
+  # input-stream 入力ストリーム
+  # param1+ 対象文字列
+  if [ -t 0 ]; then
+    if [ "$#" -ne 0 ]; then
+      for arg in "$@"; do
+        echo "$arg" | sed -e 's/^\s*//' -e 's/\s*$//'
+      done
+    fi
+  else
+    cat - | sed -e 's/^\s*//' -e 's/\s*$//'
+  fi
+}

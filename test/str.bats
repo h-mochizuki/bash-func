@@ -393,3 +393,43 @@ c''' ]
   [ "$status" -eq 0 ]
   [ "${output}" == 'a' ]
 }
+
+@test "str.trim : empty" {
+  run str.trim
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "str.trim : '  ab' -> 'ab'" {
+  run str.trim '  ab'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'ab' ]
+}
+
+@test "str.trim : 'ab  ' -> 'ab'" {
+  run str.trim 'ab  '
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'ab' ]
+}
+
+@test "str.trim : '  ab  ' -> 'ab'" {
+  run str.trim '  ab  '
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'ab' ]
+}
+
+@test "str.trim : '  a  b  ' -> 'a  b'" {
+  run str.trim '  a  b'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'a  b' ]
+}
