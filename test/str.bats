@@ -481,3 +481,67 @@ c''' ]
   [ "$status" -eq 0 ]
   [ "${output}" == '' ]
 }
+
+@test "str.fill : empty" {
+  run str.fill
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+  [ "${output}" == '' ]
+}
+
+@test "str.fill : not number" {
+  run str.fill "hoge"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+  [ "${output}" == '' ]
+}
+
+@test "str.fill 5 : -> '     '" {
+  run str.fill 5
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '     ' ]
+}
+
+@test "str.fill 5 ' ' : 'a' -> 'a    '" {
+  run str.fill 5 ' ' 'a'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'a    ' ]
+}
+
+@test "str.fill 5 ' ' : 'abc' -> 'abc  '" {
+  run str.fill 5 ' ' 'abc'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'abc  ' ]
+}
+
+@test "str.fill 5 '0' : 'abc' -> 'abc00'" {
+  run str.fill 5 '0' 'abc'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'abc00' ]
+}
+
+@test "str.fill -5 ' ' : 'a' -> '    a'" {
+  run str.fill -5 ' ' 'a'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '    a' ]
+}
+
+@test "str.fill -5 '0' : 'abc' -> '00abc'" {
+  run str.fill -5 '0' 'abc'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '00abc' ]
+}
