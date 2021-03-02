@@ -272,15 +272,12 @@ str.fill() {
   # param2 指定文字
   # param3+ 対象文字列
   [[ "$#" -eq 0 ]] && return 1
-  str.isInteger "$1" >/dev/null 2>&1
-  [[ "$?" -ne 0 ]] && return 1
-  local max="${1#-}"
+  str.isInteger "$1" ||  return 1
   local justified="left"
   [[ "${1%%[0-9]*}" == "-" ]] && justified="right"
-  shift
-  local pad="${1:- }"
+  local max="${1#-}"; shift
+  local pad="${1:- }"; shift
   local full=$( str.times "${pad}" $(( ${max} / ${#pad} + 1 )) )
-  shift
   [[ "${justified}" == "left" ]] && {
     str.stream "$@" | echo "$(cat)${full}" | str.take ${max}
   } || {
