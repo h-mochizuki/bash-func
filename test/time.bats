@@ -124,3 +124,37 @@ setup() {
   [ "$status" -eq 124 ]
   [ "${output}" == '' ]
 }
+
+@test "time.delay : empty" {
+  run time.delay
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "time.delay : not number" {
+  run time.delay "aa"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [[ "${output}" =~ "sleep" ]]
+}
+
+@test "time.delay 1s" {
+  run time.delay 1s
+  sleep 1s
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "time.delay 1s : echo 'hoge'" {
+  run time.delay 1s echo "hoge"
+  sleep 2s
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'hoge' ]
+}

@@ -144,3 +144,15 @@ time.timeout() {
   # returnCd 0:正常終了 124:タイムアウト
   timeout "$@"
 }
+
+time.delay() {
+  # 指定秒数後に処理を実行します
+  # param1 指定秒数
+  # param2+ 実行したい処理（bash -c 'do somethings'が便利）
+  # return 実行結果
+  # returnCd 0:正常終了 それ以外:エラー
+  (
+    sleep ${1:-1};shift
+    "$@"
+  ) &
+}
