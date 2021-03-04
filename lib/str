@@ -284,3 +284,35 @@ str.fill() {
     str.stream "$@" | echo "${full}$(cat)" | str.take -${max}
   }
 }
+
+str.base64() {
+  # 文字列をbase64エンコード/デコードします
+  # input-stream 入力ストリーム
+  # opt: d デコード
+  # param1+ 対象文字列
+  local OPTIND
+  local decode=''
+  while getopts :d OPT
+  do
+    case $OPT in
+      d) decode='true'
+      ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+
+  input-stream() {
+    if [ -t 0 ]; then
+      if [ "$#" -ne 0 ];then
+        echo -n "$@"
+      fi
+    else
+      cat -
+    fi
+  }
+  [[ "x${decode}" == "x" ]] && {
+    input-stream "$@" | base64 | tr '/+' '_-' | tr -d '='
+  } || {
+    input-stream "$@" | base64 -d 2>/dev/null
+  }
+}

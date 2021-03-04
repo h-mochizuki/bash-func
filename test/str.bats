@@ -545,3 +545,35 @@ c''' ]
   [ "$status" -eq 0 ]
   [ "${output}" == '00abc' ]
 }
+
+@test "str.base64 : empty" {
+  run str.base64
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "str.base64 : 'abcあいう' -> 'YWJj44GC44GE44GG'" {
+  run str.base64 'abcあいう'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'YWJj44GC44GE44GG' ]
+}
+
+@test "str.base64 -d : empty" {
+  run str.base64 -d
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "str.base64 -d : 'YWJj44GC44GE44GG' -> 'abcあいう'" {
+  run str.base64 -d 'YWJj44GC44GE44GG'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'abcあいう' ]
+}
