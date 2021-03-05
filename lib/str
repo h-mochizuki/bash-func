@@ -84,13 +84,7 @@ str.stream() {
   # input-stream 入力ストリーム
   # param1+ 入力引数
   # return ストリーム
-  if [ -t 0 ]; then
-    if [ "$#" -ne 0 ];then
-      echo "$@"
-    fi
-  else
-    cat -
-  fi
+  [[ -t 0 ]] && echo "$@" || cat -
 }
 
 str.toLower() {
@@ -191,7 +185,6 @@ str.isNumber() {
   # returnCd 0:数値 1:数値ではない
   [[ "$#" -eq 0 ]] && return 1
   str.isInteger "${1/./}"
-  return "$?"
 }
 
 str.times() {
@@ -227,11 +220,9 @@ str.initial() {
   # input-stream 入力ストリーム
   # param1+ 対象文字列
   if [ -t 0 ]; then
-    if [ "$#" -ne 0 ]; then
-      for arg in "$@"; do
-        echo "$arg" | sed -e 's/^\(.\).*$/\1/'
-      done
-    fi
+    for arg in "$@"; do
+      echo "$arg" | sed -e 's/^\(.\).*$/\1/'
+    done
   else
     cat - | sed -e 's/^\(.\).*$/\1/'
   fi
@@ -242,11 +233,9 @@ str.trim() {
   # input-stream 入力ストリーム
   # param1+ 対象文字列
   if [ -t 0 ]; then
-    if [ "$#" -ne 0 ]; then
-      for arg in "$@"; do
-        echo "$arg" | sed -e 's/^\s*//' -e 's/\s*$//'
-      done
-    fi
+    for arg in "$@"; do
+      echo "$arg" | sed -e 's/^\s*//' -e 's/\s*$//'
+    done
   else
     cat - | sed -e 's/^\s*//' -e 's/\s*$//'
   fi
@@ -302,13 +291,7 @@ str.base64() {
   shift $((OPTIND - 1))
 
   input-stream() {
-    if [ -t 0 ]; then
-      if [ "$#" -ne 0 ];then
-        echo -n "$@"
-      fi
-    else
-      cat -
-    fi
+    [[ -t 0 ]] && echo -n "$@" || cat -
   }
   [[ "x${decode}" == "x" ]] && {
     input-stream "$@" | base64 | tr '/+' '_-' | tr -d '='
