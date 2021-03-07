@@ -116,7 +116,7 @@ setup() {
   [ "$status" -eq 0 ]
 }
 
-@test "arr.car : empy" {
+@test "arr.car : empty" {
   run arr.car
   echo "status: ${status}"
   echo "output: ${output}"
@@ -140,7 +140,7 @@ setup() {
   [ "${output}" == "ONE" ]
 }
 
-@test "arr.head : empy" {
+@test "arr.head : empty" {
   run arr.head
   echo "status: ${status}"
   echo "output: ${output}"
@@ -164,7 +164,7 @@ setup() {
   [ "${output}" == "ONE" ]
 }
 
-@test "arr.cdr : empy" {
+@test "arr.cdr : empty" {
   run arr.cdr
   echo "status: ${status}"
   echo "output: ${output}"
@@ -188,7 +188,7 @@ setup() {
   [ "${output}" == "TWO THREE" ]
 }
 
-@test "arr.tail : empy" {
+@test "arr.tail : empty" {
   run arr.cdr
   echo "status: ${status}"
   echo "output: ${output}"
@@ -212,7 +212,7 @@ setup() {
   [ "${output}" == "TWO THREE" ]
 }
 
-@test "arr.last : empy" {
+@test "arr.last : empty" {
   run arr.last
   echo "status: ${status}"
   echo "output: ${output}"
@@ -236,7 +236,7 @@ setup() {
   [ "${output}" == "THREE" ]
 }
 
-@test "arr.take : empy" {
+@test "arr.take : empty" {
   run arr.take
   echo "status: ${status}"
   echo "output: ${output}"
@@ -284,7 +284,7 @@ setup() {
   [ "${output}" == "ONE TWO THREE" ]
 }
 
-@test "arr.drop : empy" {
+@test "arr.drop : empty" {
   run arr.drop
   echo "status: ${status}"
   echo "output: ${output}"
