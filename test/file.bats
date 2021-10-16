@@ -6,10 +6,10 @@
 setup() {
   load $BATS_TEST_DIRNAME/../lib/file
   EXECUTABLE_FILE="${BATS_TMPDIR}/execfile"
-  touch "${EXECUTABLE_FILE}"
+  echo "${EXECUTABLE_FILE}" > "${EXECUTABLE_FILE}"
   chmod +x "${EXECUTABLE_FILE}"
   NOTEXECUTABLE_FILE="${BATS_TMPDIR}/notexecfile"
-  touch "${NOTEXECUTABLE_FILE}"
+  echo "${NOTEXECUTABLE_FILE}" > "${NOTEXECUTABLE_FILE}"
 }
 
 teardown() {
@@ -75,4 +75,60 @@ teardown() {
   echo "output: ${output}"
   [ "$status" -eq 0 ]
   [ "${output}" == "${BATS_TEST_DIRNAME}" ]
+}
+
+@test "file.isSame : empty" {
+  run file.isSame
+  [ "$status" -eq 1 ]
+  [ "${output}" == '' ]
+}
+
+@test "file.isSame : 1 param only" {
+  pushd "${BATS_TEST_DIRNAME}"
+  run file.isSame "file.bats"
+  popd
+  [ "$status" -eq 1 ]
+  [ "${output}" == '' ]
+}
+
+@test "file.isSame : same file" {
+  pushd "${BATS_TEST_DIRNAME}"
+  run file.isSame "file.bats" "file.bats"
+  popd
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "file.isSame : same dir" {
+  run file.isSame "${BATS_TEST_DIRNAME}" "${BATS_TEST_DIRNAME}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "file.isSame : from file not found" {
+  pushd "${BATS_TEST_DIRNAME}"
+  run file.isSame "file1.bats" "file.bats"
+  popd
+  [ "$status" -eq 2 ]
+  [ "${output}" == '' ]
+}
+
+@test "file.isSame : target file not found" {
+  pushd "${BATS_TEST_DIRNAME}"
+  run file.isSame "file.bats" "file2.bats"
+  popd
+  [ "$status" -eq 2 ]
+  [ "${output}" == '' ]
+}
+
+@test "file.isSame : targetdirectory not found" {
+  run file.isSame "${BATS_TEST_DIRNAME}" "${BATS_TEST_DIRNAME}hogehogepiyopiyo"
+  [ "$status" -eq 1 ]
+  [[ "${output}" =~ md5sum.*$ ]]
+}
+
+@test "file.isSame : targetdirectory not match" {
+  run file.isSame "${BATS_TEST_DIRNAME}" "/tmp"
+  [ "$status" -eq 1 ]
+  [[ "${output}" =~ md5sum.*$ ]]
 }

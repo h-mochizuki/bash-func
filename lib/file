@@ -124,3 +124,32 @@ file.isBelongedTo() {
   done
   return 1
 }
+
+file.isSame() {
+  # 2つのファイルもしくはディレクトリが同じものかを比較します
+  # param1 比較対象ファイル1
+  # param2 比較対象ファイル2
+  # returnCd 0:一致した それ以外: 一致しなかった
+  [[ ! "$#" -eq 2 ]] && return 1
+  file.isDirectory "${1}"
+  if [[ "$?" -eq 0 ]];then
+    file.isFile "${2}" && echo "'${2}' is not directroy" && return 2
+    local tmpfile=$(mktemp)
+    rm_tmpfile() {
+      [[ -f "${tmpfile}" ]] && rm -f "${tmpfile}"
+    }
+    trap rm_tmpfile EXIT RETURN
+    trap 'trap - EXIT RETURN; rm_tmpfile; exit -1' INT PIPE TERM
+    (
+      cd "${1}"
+      find . -type f -exec md5sum {} \; > "${tmpfile}"
+    )
+    (
+      cd "${2}"
+      md5sum --quiet -c "${tmpfile}" >/dev/null
+    )
+  else
+    file.isDirectory "${2}" && echo "'${2}' is directory" && return 2
+    cmp -s "${1}" "${2}" 2>/dev/null
+  fi
+}
