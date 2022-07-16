@@ -164,3 +164,13 @@ arr.drop() {
     echo "${args[@]:$size:$limit-1}"
   fi
 }
+
+arr.uniq() {
+  # 配列から重複を取り除きます
+  # return 重複を取り除いた配列
+  local elements=( "$@" )
+  local e
+  for e in "${elements[@]}";do
+    echo $e
+  done | awk '!a[$0]++{print}'
+}

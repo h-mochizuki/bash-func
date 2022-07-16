@@ -339,3 +339,57 @@ setup() {
   [ "$status" -eq 0 ]
   [ "${output}" == "" ]
 }
+
+@test "arr.uniq : empty" {
+  run arr.uniq
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "" ]
+}
+
+@test "arr.uniq : one" {
+  run arr.uniq 1
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "1" ]
+}
+
+@test "arr.uniq : two" {
+  run arr.uniq 1 2
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "1
+2" ]
+}
+
+@test "arr.uniq : duplicate" {
+  run arr.uniq 1 1
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "1" ]
+}
+
+@test "arr.uniq : words-1" {
+  run arr.uniq "I" "love" "you"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "I
+love
+you" ]
+}
+
+@test "arr.uniq : words-2" {
+  run arr.uniq "I" "sed" "Oops ..." "and" "Oops ..."
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "I
+sed
+Oops ...
+and" ]
+}
