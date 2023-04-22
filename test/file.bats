@@ -132,3 +132,60 @@ teardown() {
   [ "$status" -eq 1 ]
   [[ "${output}" =~ md5sum.*$ ]]
 }
+
+@test "file.eval : empty" {
+  run file.eval
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "file.eval : text" {
+  run file.eval <<<'abcdefg'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'abcdefg' ]
+}
+
+@test "file.eval : variable" {
+  VAR_TEST='12345'
+  run file.eval <<<'${VAR_TEST}'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '12345' ]
+}
+
+@test "file.eval : script" {
+  run file.eval <<<'$(echo "abcdefg")'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'abcdefg' ]
+}
+
+@test "file.eval : complex" {
+  VAR_TEST='54321'
+  run file.eval <<<'''\
+12345
+${VAR_TEST}
+
+$(echo "abcdefg")
+$(
+  for i in 6 7 8 9 0; do
+    echo -n "$i"
+  done
+)
+'''
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == """\
+12345
+54321
+
+abcdefg
+67890""" ]
+}

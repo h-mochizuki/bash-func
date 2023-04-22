@@ -160,3 +160,15 @@ file.isSame() {
     cmp -s "${1}" "${2}" 2>/dev/null
   fi
 }
+
+file.eval() {
+  # ファイルに含まれる環境変数やスクリプトを評価した文字列を返します
+  # input-stream 入力ストリーム
+  # param1 ファイルパス
+  # return 環境変数やスクリプトを評価した文字列
+  if [ -t 0 ]; then
+    [[ "$#" -ne 0 ]] && cat "$1"
+  else
+    cat -
+  fi | eval "echo -e \"$(cat)\""
+}
