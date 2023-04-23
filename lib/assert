@@ -29,6 +29,12 @@ assert.isWindows() {
   esac
 }
 
+assert.isWsl() {
+  # Windows WSL環境で実行されているかを返します
+  # returnCd 0:Windows WSL環境で実行されている 1:Windows WSL環境以外で実行されている
+  grep microsoft /proc/version >/dev/null 2>&1
+}
+
 assert.installed() {
   # 指定されたコマンドが実行可能かを返します
   # param1 コマンドやファンクション
