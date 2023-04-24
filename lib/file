@@ -172,3 +172,9 @@ file.eval() {
     cat -
   fi | eval "echo -e \"$(cat)\""
 }
+
+file.eachLine() {
+  for line in "$(cat $@)";do
+    echo "$line"
+  done
+}
