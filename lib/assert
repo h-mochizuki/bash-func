@@ -207,3 +207,149 @@ assert.yn() {
       return 1;;
   esac
 }
+
+assert.choice() (
+  # 指定した選択肢から選択させます
+  # paramN+ 選択肢文言
+  # opt: i 選択肢ではなくインデックスを返す
+  # opt: o ひとつだけ選択
+  # return 選択された選択肢文言
+  local OPTIND
+  local cursor='\e[36m>\e[m'
+  local selected='\e[36m*\e[m'
+  local current=0
+  local returnIndex=
+  local onlyOne=
+  while getopts io OPT
+  do
+    case $OPT in
+      i) returnIndex='y'
+      ;;
+      o) onlyOne='y'
+      ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+
+  local choices=( "$@" )
+  local choicesNum="$#"
+  local selects=()
+
+  getSelected() {
+    local sc=()
+    local idx=()
+    local ridx=
+    local OPTIND
+    while getopts i OPT
+    do
+      case $OPT in
+        i) ridx='y'
+        ;;
+      esac
+    done
+    shift $((OPTIND - 1))
+    for i in "${!choices[@]}";do
+      # 選択されている選択肢文言を保管
+      if [[ -n "${selects[i]}" ]];then
+        sc=( "${sc[@]}" "${choices[i]}" )
+        idx=( "${idx[@]}" "$i" )
+      fi
+    done
+    if [[ -n "${ridx}" ]];then
+      echo -n "${idx[@]}"
+    else
+      echo -n "${sc[@]}"
+    fi
+  }
+
+  menu() {
+    echo "移動:[↑]or[↓], 選択:[SPACE], 決定:[ENTER]"
+    for i in "${!choices[@]}";do
+      # 選択肢表示
+      if [[ $current -eq $i ]];then
+        echo -n -e "${cursor} [${selects[i]:- }] "
+      else
+        echo -n -e "  [${selects[i]:- }] "
+      fi
+      echo "${choices[i]}"
+    done
+    echo;
+    echo "selected: $(getSelected)"
+  }
+
+  clearMenu() {
+    local apend=${1:-0}
+    local columnSize=$(tput cols)
+    for ((i=0; i<$(( $choicesNum + 3 + $apend )); i++));do
+      tput cuu 1
+      tput cub ${columnSize}
+      tput el
+    done
+  }
+
+  selectChoices() {
+    while true;do
+      while menu && IFS= read -r -n1 -s sel && [[ -n "$sel" ]]; do
+        if [[ "$sel" == $'\x1b' ]];then
+          read -r -n2 -s rest
+          sel+="$rest"
+        fi
+        clearMenu
+
+        case "$sel" in
+          $'\x1b\x5b\x41') #up arrow
+            if [[ "$current" -ne 0 ]]; then
+                current=$(( current - 1 ))
+            else
+                current=$(( ${#choices[@]}-1 ))
+            fi
+            ;;
+          $'\x1b\x5b\x42') #down arrow
+            if [[ "$current" -ne $(( ${#choices[@]} - 1 )) ]]; then
+                current=$(( ${current} + 1 ))
+            else
+                current=0
+            fi
+            ;;
+          $'\x20') #space
+            if [[ "${selects[current]}" == "${selected}" ]];then
+              selects[current]=""
+            else
+              if [[ -n "${onlyOne}" ]];then
+                selects=()
+                selects[current]="${selected}"
+              else
+                selects[current]="${selected}"
+              fi
+            fi
+            ;;
+        esac
+      done
+
+      local yn
+      read -p "選択は終わりましたか？[Y/n]: " yn
+      case "${yn}" in
+        '' | [yY]* )
+          break
+          ;;
+        *)
+          ;;
+      esac
+      clearMenu 1
+    done
+  }
+  selectChoices >&2
+  if [[ -n "${returnIndex}" ]];then
+    echo "$(getSelected -i)"
+  else
+    echo "$(getSelected)"
+  fi
+)
+
+assert.select() {
+  # 指定した選択肢からひとつだけ選択させます
+  # paramN+ 選択肢文言
+  # opt: i 選択肢ではなくインデックスを返す
+  # return 選択された選択肢文言
+  assert.choice -o "$@"
+}
