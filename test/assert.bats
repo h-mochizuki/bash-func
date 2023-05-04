@@ -123,3 +123,11 @@ setup() {
   [ "$status" -eq 1 ]
   [ "${output}" == '' ]
 }
+
+@test "assert.choice empty" {
+  run assert.choice
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
