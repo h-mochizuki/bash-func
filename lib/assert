@@ -233,6 +233,8 @@ assert.choice() (
   local choiceCnt="$#"
   local selects=()
 
+  [[ $choiceCnt -eq 0 ]] && return 0
+
   getSelected() {
     local sc=()
     local idx=()
