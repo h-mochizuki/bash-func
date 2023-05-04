@@ -131,3 +131,19 @@ setup() {
   [ "$status" -eq 0 ]
   [ "${output}" == '' ]
 }
+
+@test "assert.password empty" {
+  run assert.password
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+  [ "${output}" == 'variable-name is required!' ]
+}
+
+@test "assert.password novalue" {
+  run assert.password "password_test" <<<''
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'password_test: ' ]
+}
