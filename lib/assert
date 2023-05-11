@@ -277,13 +277,9 @@ assert.choice() (
   }
 
   clearMenu() {
-    local append=${1:-0}
-    local columnSize=$(tput cols)
-    for ((i=0; i<$(( $choiceCnt + 3 + $append )); i++));do
-      tput cuu 1
-      tput cub ${columnSize}
-      tput el
-    done
+    tput cuu $(( $choiceCnt + 3 + ${1:-0} ))
+    tput cub $(tput cols)
+    tput ed
   }
 
   selectChoices() {
