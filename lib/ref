@@ -21,7 +21,7 @@ ref() {
     cat "$base/${1}"
   else
     if [[ "$(type -t $1)" == "function" ]] && [[ -f "$base/${1%.*}" ]];then
-      cat "$base/${1%.*}" | sed -n -e "/^${1}.*{/,/^}/p"
+      cat "$base/${1%.*}" | sed -n -e "/^${1}.*[\({]/,/^[)}]/p"
     else
       type "$1"
     fi
