@@ -277,9 +277,9 @@ assert.choice() (
   }
 
   clearMenu() {
-    tput cuu $(( $choiceCnt + 3 + ${1:-0} ))
-    tput cub $(tput cols)
-    tput ed
+    tput cuu $(( $choiceCnt + 3 + ${1:-0} )) # 描画した分だけ上にずれる
+    tput cub $(tput cols) # 左端にずれる
+    tput ed # カーソル以下を初期化
   }
 
   selectChoices() {
@@ -361,8 +361,8 @@ assert.password() {
   echo -n "$variable: "
   while IFS= read -r -n 1 -s key && [[ -n "$key" ]]; do
     if [[ "$key" == $'\x7f' ]];then # backspace
-      tput cub 1
-      tput el
+      tput cub 1 # 左にずれる
+      tput el # 文字削除
       invisible="${invisible:0:${#invisible}-1}"
     else
       echo -n "*"
