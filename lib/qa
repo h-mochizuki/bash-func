@@ -20,7 +20,7 @@ qa.yn() {
   esac
 }
 
-qa.choice() (
+qa.checkbox() (
   # 指定した選択肢から選択させます
   # paramN+ 選択肢文言
   # opt: i 選択肢ではなくインデックスを返す
@@ -152,12 +152,12 @@ qa.choice() (
   fi
 )
 
-qa.select() {
+qa.radio() {
   # 指定した選択肢からひとつだけ選択させます
   # paramN+ 選択肢文言
   # opt: i 選択肢ではなくインデックスを返す
   # return 選択された選択肢文言
-  assert.choice -o "$@"
+  qa.checkbox -o "$@"
 }
 
 qa.password() {

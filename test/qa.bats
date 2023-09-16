@@ -59,8 +59,8 @@ setup() {
   [ "${output}" == '' ]
 }
 
-@test "qa.choice empty" {
-  run qa.choice
+@test "qa.checkbox empty" {
+  run qa.checkbox
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
