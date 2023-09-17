@@ -192,7 +192,7 @@ str.times() {
   # param1 文字列
   # param2 指定回数（デフォルト1回）
   # return 指定回数繰り返された文字列
-  eval "printf '${1:-''}%.0s' {1..${2:-1}}"
+  printf "%*s" ${2:-1} | sed -e "s/ /${1:-}/g"
 }
 
 str.evalstr() {
@@ -299,3 +299,11 @@ str.base64() {
     input-stream "$@" | base64 -d 2>/dev/null
   }
 }
+
+str.hr() (
+  local width=80
+  $(tput cols 2>/dev/null 1>/dev/null) && {
+    width=$(tput cols);
+  }
+  str.times "${1--}" "${width}" | str.take ${width}
+)
