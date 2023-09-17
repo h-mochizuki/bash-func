@@ -174,7 +174,23 @@ file.eval() {
 }
 
 file.eachLine() {
+  # ファイル内容を一行ずつ出力します
+  # param1 ファイルパス
+  # return 一行ずつのファイル内容
   for line in "$(cat $@)";do
     echo "$line"
   done
 }
+
+file.tree() (
+  # ディレクトリ階層構造を表示します
+  # param1 ファイルパス
+  # return ディレクトリ階層構造
+  cd ${1:-.} >/dev/null 2>&1 && {
+    pwd
+    find . | sort | sed '1d;s/^\.//;s/\/\([^/]*\)$/|- \1/;s/\/[^/|]*/|  /g'
+  } || {
+    echo "file.tree: ${1:-}: No such directory"
+    exit 1
+  }
+)
