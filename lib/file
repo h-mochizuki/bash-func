@@ -182,7 +182,7 @@ file.eachLine() {
   done
 }
 
-file.tree() (
+dir.tree() (
   # ディレクトリ階層構造を表示します
   # param1 ファイルパス
   # return ディレクトリ階層構造
