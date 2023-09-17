@@ -301,9 +301,27 @@ str.base64() {
 }
 
 str.hr() (
+  # ターミナルに水平線を引きます
+  # param1 横幅
+  # return 水平線
   local width=80
   $(tput cols 2>/dev/null 1>/dev/null) && {
     width=$(tput cols);
   }
   str.times "${1--}" "${width}" | str.take ${width}
+)
+
+str.rect() (
+  # 四角形を描画します
+  # param1 横幅
+  # param2 高さ
+  # return 四角形
+  local w=${1:-20}
+  [[ w -le 1 ]] && {
+    str.times "-\n" ${2:-1}
+    exit
+  }
+  local h=${2:-$(( w / 2 + 1))}
+  local w2=$(( w -2 ))
+  cat <<<$(str.fill $w '-'; [[ ${h} -ge 2 ]] && str.times "|$(str.fill ${w2})|\n" $(( h -2 )); str.fill $w '-')
 )

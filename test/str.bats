@@ -577,3 +577,67 @@ c''' ]
   [ "$status" -eq 0 ]
   [ "${output}" == 'abcあいう' ]
 }
+
+@test "str.hr" {
+  run str.hr
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [[ "${output}" =~ ^-+$ ]]
+}
+
+@test "str.hr '='" {
+  run str.hr '='
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [[ "${output}" =~ ^=+$ ]]
+}
+
+@test "str.rect" {
+  run str.rect
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '--------------------
+|                  |
+|                  |
+|                  |
+|                  |
+|                  |
+|                  |
+|                  |
+|                  |
+|                  |
+--------------------' ]
+}
+
+@test "str.rect 1" {
+  run str.rect 1
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '-' ]
+}
+
+@test "str.rect 3 5" {
+  run str.rect 3 5
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '---
+| |
+| |
+| |
+---' ]
+}
+
+@test "str.rect 5 3" {
+  run str.rect 5 3
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '-----
+|   |
+-----' ]
+}
