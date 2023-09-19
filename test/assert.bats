@@ -75,3 +75,27 @@ setup() {
   [ "$status" -eq 1 ]
   [ "${output}" == '[ERROR]!!FAILED!! -exec-> false ' ]
 }
+
+@test "assert.progress : empty" {
+  run assert.progress
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+  [[ "${output}" =~ ^[^\S]+0/100:\[[^\S]+]$ ]]
+}
+
+@test "assert.progress : 10%" {
+  run assert.progress <<<"10"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+  [[ "${output}" =~ ^[^\S]+10/100:\[#+[^\S]+]$ ]]
+}
+
+@test "assert.progress : full" {
+  run assert.progress <<<"100"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [[ "${output}" =~ 100/100:\[#+]$ ]]
+}

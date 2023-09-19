@@ -196,7 +196,7 @@ assert.lock() {
 
 assert.progress() {
   local total=100
-  local width=$(( $(tput cols) -11 ))
+  local width=$(( $(tput cols) -10 ))
   ([[ -t 0 ]] && echo "$@" || cat -) | while read -r l; do
     local cur="$(echo ${l/#/} | awk '{printf("%d\n",$1 + 0.5)}')"
     [[ "${cur}" -gt "${total}" ]] && cur="${total}"
