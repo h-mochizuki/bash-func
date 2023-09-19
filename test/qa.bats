@@ -67,6 +67,20 @@ setup() {
   [ "${output}" == '' ]
 }
 
+@test "qa.checkbox simple" {
+  run qa.checkbox 1 2 <<<"
+
+"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  diff <(echo "$output") <(echo -e '移動:[↑]or[↓], 選択:[SPACE], 決定:[ENTER]
+\e[36m>\e[m [ ] 1
+  [ ] 2
+
+selected: ')
+}
+
 @test "qa.password empty" {
   run qa.password
   echo "status: ${status}"

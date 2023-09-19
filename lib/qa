@@ -74,18 +74,17 @@ qa.checkbox() (
   }
 
   menu() {
-    echo "移動:[↑]or[↓], 選択:[SPACE], 決定:[ENTER]"
+    local view="移動:[↑]or[↓], 選択:[SPACE], 決定:[ENTER]\n"
     for i in "${!choices[@]}";do
       # 選択肢表示
       if [[ $currentIdx -eq $i ]];then
-        echo -n -e "${cursor} [${selects[i]:- }] "
+        view+="${cursor} [${selects[i]:- }] "
       else
-        echo -n -e "  [${selects[i]:- }] "
+        view+="  [${selects[i]:- }] "
       fi
-      echo "${choices[i]}"
+      view+="${choices[i]}\n"
     done
-    echo;
-    echo "selected: $(getSelected)"
+    echo -e "${view}\nselected: $(getSelected)"
   }
 
   clearMenu() {
