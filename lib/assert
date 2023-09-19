@@ -193,3 +193,19 @@ assert.lock() {
   __assert.__lock "${timeout:-10}" "${lockfile}" || exit
   trap "assert.unlock '${lockfile}'" EXIT HUP INT QUIT TERM
 }
+
+assert.progress() {
+  local total=100
+  local width=$(( $(tput cols) -11 ))
+  ([[ -t 0 ]] && echo "$@" || cat -) | while read -r l; do
+    local cur="$(echo ${l/#/} | awk '{printf("%d\n",$1 + 0.5)}')"
+    [[ "${cur}" -gt "${total}" ]] && cur="${total}"
+    local p=$(( cur * width / total ))
+    local r=$(( width - p ))
+    printf "\r\033[K%3s/%3s:[$(printf '%*s' ${p} | sed -e 's/ /#/g')$(printf '%*s' ${r})]" "${cur}" "${total}"
+    [[ "${cur}" -ge "${total}" ]] && {
+      echo;
+      exit
+    }
+  done 
+}
