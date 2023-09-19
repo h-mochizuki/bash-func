@@ -195,6 +195,11 @@ assert.lock() {
 }
 
 assert.progress() {
+  # プログレスバーを表示します
+  # param1 進捗率(0～100の数値)
+  # stream1 進捗率(0～100の数値)
+  # 実行例:
+  #  (echo 10; sleep 1;echo 50;sleep 1;echo 100) | assert.progress
   local total=100
   local width=$(( $(tput cols) -10 ))
   ([[ -t 0 ]] && echo "$@" || cat -) | while read -r l; do
