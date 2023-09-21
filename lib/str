@@ -311,6 +311,86 @@ str.hr() (
   str.times "${1--}" "${width}" | str.take ${width}
 )
 
+str.bold() {
+  # 入力内容の表示を太字にします
+  # param1+ 太字にしたい文字列
+  # return 太字にした文字列
+  echo -e "\033[1m${@}\033[0m"
+}
+alias str.f.b="str.bold"
+
+str.format.italic() {
+  # 入力内容の表示をイタリックにします
+  # param1+ イタリックにしたい文字列
+  # return イタリックにした文字列
+  echo -e "\033[3m${@}\033[0m"
+}
+alias str.f.i="str.format.italic"
+
+str.format.underline() {
+  # 入力内容にアンダーラインを引きます
+  # param1+ アンダーラインを追加したい文字列
+  # return アンダーラインを追加した文字列
+  echo -e "\033[4m${@}\033[0m"
+}
+alias str.f.u="str.format.underline"
+
+str.format.strikethrough() {
+  # 入力内容に取り消し線を引きます
+  # param1+ 取り消し線を追加したい文字列
+  # return 取り消し線を追加した文字列
+  echo -e "\033[9m${@}\033[0m"
+}
+alias str.f.d="str.format.strikethrough"
+
+str.color.gray() {
+  # 入力を灰字にします
+  # param1+ 灰字にしたい文字列
+  # return 灰字にした文字列
+  echo -e "\033[30m${@}\033[0m"
+}
+alias str.c.gray="str.color.gray"
+
+str.color.red() {
+  # 入力を赤字にします
+  # param1+ 赤字にしたい文字列
+  # return 赤字にした文字列
+  echo -e "\033[31m${@}\033[0m"
+}
+alias str.c.r="str.color.red"
+
+str.color.green() {
+  # 入力を緑字にします
+  # param1+ 緑字にしたい文字列
+  # return 緑字にした文字列
+  echo -e "\033[32m${@}\033[0m"
+}
+alias str.c.g="str.color.green"
+
+str.color.yellow() {
+  # 入力を黄字にします
+  # param1+ 黄字にしたい文字列
+  # return 黄字にした文字列
+  echo -e "\033[33m${@}\033[0m"
+}
+alias str.c.y="str.color.yellow"
+
+str.color.blue() {
+  # 入力を青字にします
+  # param1+ 青字にしたい文字列
+  # return 青字にした文字列
+  echo -e "\033[34m${@}\033[0m"
+}
+alias str.c.b="str.color.blue"
+
+str.color.purple() {
+  # 入力を紫字にします
+  # param1+ 紫字にしたい文字列
+  # return 紫字にした文字列
+  echo -e "\033[35m${@}\033[0m"
+}
+alias str.c.purple="str.color.purple"
+
 str.rect() (
   # 四角形を描画します
   # param1 横幅
