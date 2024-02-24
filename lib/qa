@@ -23,29 +23,36 @@ qa.yn() {
 qa.checkbox() (
   # 指定した選択肢から選択させます
   # paramN+ 選択肢文言
-  # opt: i 選択肢ではなくインデックスを返す
+  # opt: n 選択肢ではなく番号を返す
   # opt: o ひとつだけ選択
+  # opt: i カンマ区切りで選択済みの番号を入れる(0 始まり. oが指定された場合は後勝ち)
   # return 選択された選択肢文言
   local OPTIND
   local cursor='\e[36m>\e[m'
   local selected='\e[36m*\e[m'
+  local selectedChioces=()
   local currentIdx=0
   local asIndex=
   local selectOne=
-  while getopts io OPT
+  local selects=()
+  while getopts noi: OPT
   do
     case $OPT in
-      i) asIndex='y';;
+      n) asIndex='y';;
       o) selectOne='y';;
+      i) selectedChioces=( ${OPTARG//,/ } );;
     esac
   done
   shift $((OPTIND - 1))
 
   local choices=( "$@" )
   local choiceCnt="$#"
-  local selects=()
-
   [[ $choiceCnt -eq 0 ]] && return 0
+
+  for s in "${selectedChioces[@]}";do
+    [[ -n "${selectOne}" ]] && selects=()
+    [[ "$s" -le "$choiceCnt" ]] && selects[s]="${selected}"
+  done
 
   getSelected() {
     local sc=()
@@ -154,7 +161,8 @@ qa.checkbox() (
 qa.radio() {
   # 指定した選択肢からひとつだけ選択させます
   # paramN+ 選択肢文言
-  # opt: i 選択肢ではなくインデックスを返す
+  # opt: n 選択肢ではなく番号を返す
+  # opt: i カンマ区切りで選択済みの番号を入れる(0 始まり. 後勝ち)
   # return 選択された選択肢文言
   qa.checkbox -o "$@"
 }
