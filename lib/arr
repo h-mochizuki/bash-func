@@ -174,3 +174,51 @@ arr.uniq() {
     echo $e
   done | awk '!a[$0]++{print}'
 }
+
+arr.excludes() {
+  # 配列から指定した要素を取り除きます
+  # opt: i 除外対象
+  # param1+ 配列
+  # return 指定要素を取り除いた配列
+  local args=("$@")
+  [[ -t 0 ]] || {
+    while read line; do
+      args+=("${line}")
+    done <<< $(cat -)
+  }
+  local excludes=()
+  local items=()
+  while [[ "${#args[@]}" -gt 0 ]];do
+    case "${args[0]}" in
+      -i)
+        if [[ -n "${args[1]}" && "${args[1]}" != -* ]];then
+          excludes+=("${args[1]}")
+          args=("${args[@]:2}")
+        else
+          echo "Error: Argument for ${args[0]} is missing" >&2
+          args=("${args[@]:1}")
+        fi
+      ;;
+      -*)
+        echo "Unknown option: ${args[0]}"
+        exit 1
+        ;;
+      *)
+        items+=( "${args[0]}" )
+        args=("${args[@]:1}")
+        ;;
+    esac
+  done
+  for item in "${items[@]}"; do
+    exclude_flag=false
+    for exclude in "${excludes[@]}"; do
+      if [[ "$item" =~ ^$exclude$ ]]; then
+        exclude_flag=true
+        break
+      fi
+    done
+    if ! $exclude_flag; then
+      echo "$item"
+    fi
+  done
+}
