@@ -177,7 +177,8 @@ arr.uniq() {
 
 arr.excludes() {
   # 配列から指定した要素を取り除きます
-  # opt: i 除外対象
+  # opt: c 除外対象文字列
+  # opt: r 除外対象正規表現
   # param1+ 配列
   # return 指定要素を取り除いた配列
   local args=("$@")
@@ -186,13 +187,23 @@ arr.excludes() {
       args+=("${line}")
     done <<< $(cat -)
   }
-  local excludes=()
+  local exclude_context=()
+  local exclude_regex=()
   local items=()
   while [[ "${#args[@]}" -gt 0 ]];do
     case "${args[0]}" in
-      -i)
+      -c)
         if [[ -n "${args[1]}" && "${args[1]}" != -* ]];then
-          excludes+=("${args[1]}")
+          exclude_context+=("${args[1]}")
+          args=("${args[@]:2}")
+        else
+          echo "Error: Argument for ${args[0]} is missing" >&2
+          args=("${args[@]:1}")
+        fi
+      ;;
+      -r)
+        if [[ -n "${args[1]}" && "${args[1]}" != -* ]];then
+          exclude_regex+=("${args[1]}")
           args=("${args[@]:2}")
         else
           echo "Error: Argument for ${args[0]} is missing" >&2
@@ -211,8 +222,14 @@ arr.excludes() {
   done
   for item in "${items[@]}"; do
     exclude_flag=false
-    for exclude in "${excludes[@]}"; do
-      if [[ "$item" =~ ^$exclude$ ]]; then
+    for exclude in "${exclude_context[@]}"; do
+      if [[ "$item" == "$exclude" ]]; then
+        exclude_flag=true
+        break
+      fi
+    done
+    for exclude in "${exclude_regex[@]}"; do
+      if [[ "$item" =~ $exclude ]]; then
         exclude_flag=true
         break
       fi

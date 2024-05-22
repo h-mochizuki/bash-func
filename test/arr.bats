@@ -407,7 +407,18 @@ Oops ..." ]
 }
 
 @test "arr.excludes : exclude-1" {
-  run arr.excludes -i "sed" "I" "sed" "Oops ..." "and" "Oops ..."
+  run arr.excludes -c "sed" "I" "sed" "Oops ..." "and" "Oops ..."
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "I
+Oops ...
+and
+Oops ..." ]
+}
+
+@test "arr.excludes : exclude-1 regex" {
+  run arr.excludes -r "s.d" "I" "sed" "Oops ..." "and" "Oops ..."
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
@@ -418,7 +429,17 @@ Oops ..." ]
 }
 
 @test "arr.excludes : exclude-2" {
-  run arr.excludes -i "sed" -i "and" "I" "sed" "Oops ..." "and" "Oops ..."
+  run arr.excludes -c "sed" -c "and" "I" "sed" "Oops ..." "and" "Oops ..."
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "I
+Oops ...
+Oops ..." ]
+}
+
+@test "arr.excludes : exclude-2 regex" {
+  run arr.excludes -r ".ed" -r "an.*" "I" "sed" "Oops ..." "and" "Oops ..."
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
@@ -428,7 +449,7 @@ Oops ..." ]
 }
 
 @test "arr.excludes : from input-stream" {
-  run arr.excludes -i "sed" <<<"""I
+  run arr.excludes -c "sed" <<<"""I
 sed
 Oops ...
 and
