@@ -38,6 +38,20 @@ arr.join() {
   echo "${prefix}${str}${suffix}"
 }
 
+arr.size() {
+  # 指定された配列の要素数を返します
+  # param1+ 配列要素
+  # return 要素数
+  echo "$#"
+}
+
+arr.empty() {
+  # 指定された配列の要素が空かを返します
+  # param1+ 配列要素
+  # returnCd 0:空配列 1:要素がある
+  [[ "$#" -eq 0 ]]
+}
+
 arr.indexOf() {
   # 指定された要素が配列のどこにあるかを返します
   # param1 指定要素

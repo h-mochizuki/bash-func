@@ -56,6 +56,44 @@ setup() {
   [ "${output}" == "[ONE, TWO, THREE]" ]
 }
 
+@test "arr.size == 0" {
+  run arr.size
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" -eq 0 ]
+}
+
+@test "arr.size == 1" {
+  run arr.size 1
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" -eq 1 ]
+}
+
+@test "arr.size == 10" {
+  run arr.size 0 1 2 3 4 5 6 7 8 9
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" -eq 10 ]
+}
+
+@test "arr.empty : true" {
+  run arr.empty
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+}
+
+@test "arr.empty : false" {
+  run arr.empty "not empty"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+}
+
 @test "arr.indexOf <= 0 : not exists" {
   run arr.indexOf "ZERO" "${TEST_ARRAY[@]}"
   echo "status: ${status}"
