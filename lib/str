@@ -2,6 +2,8 @@
 # =====================================
 #            文字列関数定義
 # =====================================
+base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
+source "${base}/num"
 
 # ----------------
 #     関数定義
@@ -174,9 +176,7 @@ str.isInteger() {
   # 入力文字列が整数かどうかを返します
   # param1 入力文字列
   # returnCd 0:整数 1:整数ではない
-  [[ "$#" -eq 0 ]] && return 1
-  expr "${1}" + 1 >/dev/null 2>&1
-  [[ $? -lt 2 ]]
+  num.isInteger "$1"
 }
 
 str.isNumber() {
@@ -184,7 +184,7 @@ str.isNumber() {
   # param1 入力文字列
   # returnCd 0:数値 1:数値ではない
   [[ "$#" -eq 0 ]] && return 1
-  str.isInteger "${1/./}"
+  num.isInteger "${1/./}"
 }
 
 str.times() {

@@ -1,0 +1,108 @@
+#!/bin/bash
+# =====================================
+#              数値関数定義
+# =====================================
+
+# ----------------
+#     関数定義
+# ----------------
+num.isInteger() {
+  # 入力文字列が整数かどうかを返します
+  # param1 入力文字列
+  # returnCd 0:整数 1:整数ではない
+  [[ "$#" -eq 0 ]] && return 1
+  expr "${1}" + 1 >/dev/null 2>&1
+  [[ $? -lt 2 ]]
+}
+
+num.isNumber() {
+  # 小数の場合も考慮し、入力文字列が数値かどうかを返します
+  # param1 入力文字列
+  # returnCd 0:数値 1:数値ではない
+  [[ "$#" -eq 0 ]] && return 1
+  num.isInteger "${1/./}"
+}
+
+num.greaterThan() {
+  # 小数の場合も考慮し、先の数値より後の数値が大きいかを判定します
+  # param1 比較対象1
+  # param2 比較対象2
+  # returnCd 0:param1<=param2 or param2 is invalid number
+  #          1:param1>param2
+
+  # 入力なし
+  [[ -z "$1" ]] && return 0
+  # 対象1だけあり
+  [[ -z "$2" ]] && return 0
+  # 対象2が数値じゃない
+  num.isNumber "$2" || {
+    return 0
+  }
+  # 対象1が数値じゃない
+  num.isNumber "$1" || {
+    return 1
+  }
+  # 数値同士なので大小判定可能
+  [[ $(echo "$1 > $2" | bc) == 1 ]] && {
+    return 1
+  } || {
+    return 0
+  }
+}
+
+num.lesserThan() {
+  # 小数の場合も考慮し、先の数値より後の数値が小さいかを判定します
+  # param1 比較対象1
+  # param2 比較対象2
+  # returnCd 0:param1>=param2 or param2 is invalid number
+  #          1:param1<param2
+
+  # 入力なし
+  [[ -z "$1" ]] && return 0
+  # 対象1だけあり
+  [[ -z "$2" ]] && return 0
+  # 対象2が数値じゃない
+  num.isNumber "$2" || {
+    return 0
+  }
+  # 対象1が数値じゃない
+  num.isNumber "$1" || {
+    return 1
+  }
+  # 数値同士なので大小判定可能
+  [[ $(echo "$2 > $1" | bc) == 1 ]] && {
+    return 1
+  } || {
+    return 0
+  }
+}
+
+num.max() {
+  # 小数の場合も考慮し、入力内容のうち一番大きいものを表示します
+  # param1+ 比較対象
+  # return 一番大きい数値
+  local elements=( "$@" )
+  local max="${elements[0]}"
+  num.isNumber "$max" || max=''
+  for s in "${elements[@]:1}";do
+    num.isNumber "$s" && {
+     num.greaterThan "$max" "$s" && max="$s"
+    }
+  done
+  echo -n "$max"
+}
+
+num.min() {
+  # 小数の場合も考慮し、入力内容のうち一番小さいものを表示します
+  # param1+ 比較対象
+  # return 一番小さい数値
+  local elements=( "$@" )
+  local min="${elements[0]}"
+  num.isNumber "$min" || min=''
+  for s in "${elements[@]:1}";do
+    num.isNumber "$s" && {
+     num.greaterThan "$s" "$min" && min="$s"
+    }
+  done
+  echo -n "$min"
+}
