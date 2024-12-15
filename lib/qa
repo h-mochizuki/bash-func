@@ -2,6 +2,8 @@
 # =====================================
 #              質問関数定義
 # =====================================
+base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
+source "${base}/num"
 
 # ----------------
 #     関数定義
@@ -110,21 +112,24 @@ qa.checkbox() (
         clearMenu
 
         case "$pushedKey" in
-          $'\x1b\x5b\x41') #up arrow
+          #up arrow
+          $'\x1b\x5b\x41')
             if [[ "$currentIdx" -ne 0 ]]; then
                 currentIdx=$(( currentIdx - 1 ))
             else
                 currentIdx=$(( ${#choices[@]}-1 ))
             fi
             ;;
-          $'\x1b\x5b\x42') #down arrow
+          #down arrow
+          $'\x1b\x5b\x42')
             if [[ "$currentIdx" -ne $(( ${#choices[@]} - 1 )) ]]; then
                 currentIdx=$(( ${currentIdx} + 1 ))
             else
                 currentIdx=0
             fi
             ;;
-          $'\x20') #space
+          #space
+          $'\x20')
             if [[ "${selects[currentIdx]}" == "${selected}" ]];then
               selects[currentIdx]=""
             else
@@ -190,4 +195,17 @@ qa.password() {
   done
   read -r -s $variable <<<"$invisible"
   echo;
+}
+
+qa.progress() {
+  local current=${1:-0}
+  num.isNumber "$current" || current=0
+  local total=${2:-100}
+  num.isNumber "$total" || total=100
+  current=$(num.min "$current" "$total")
+  local progress=$(($current * 100 / ${total}))
+  local bar="$(yes '#' | head -n ${progress} | tr -d '\n')"
+
+  [[ -z "$bar" ]] && bar='_'
+  printf "\r[%-100s] (%3d/%3d)" ${bar} ${current} ${total}
 }
