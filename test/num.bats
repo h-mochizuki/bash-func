@@ -449,3 +449,27 @@ setup() {
   [ "$status" -eq 0 ]
   [ "${output}" == '-1' ]
 }
+
+@test "num.average : 1 0 -1 => 0" {
+  run num.average 1 0 -1
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '0' ]
+}
+
+@test "num.average : 1 2 3 => 2" {
+  run num.average 1 2 3
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '2' ]
+}
+
+@test "num.average : 1 2 3 4 5 6 7 8 9 10 => 5.5" {
+  run num.average 1 2 3 4 5 6 7 8 9 10
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '5.5' ]
+}

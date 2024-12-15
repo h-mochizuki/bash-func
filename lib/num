@@ -106,3 +106,20 @@ num.min() {
   done
   echo -n "$min"
 }
+
+num.average() {
+  # 入力内容の平均値を表示します
+  # param1+ 対象数値
+  # return 平均値
+  local elements=( "$@" )
+  local sum="${elements[0]}"
+  local cnt=1
+  num.isNumber "$sum" || sum=0
+  for s in "${elements[@]:1}";do
+    num.isNumber "$s" && {
+      cnt=$(($cnt+1))
+      sum=$(awk "BEGIN { print $sum+$s }")
+    }
+  done
+  echo -n $(awk "BEGIN { print "$sum"/"$cnt" }")
+}
