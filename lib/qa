@@ -196,16 +196,3 @@ qa.password() {
   read -r -s $variable <<<"$invisible"
   echo;
 }
-
-qa.progress() {
-  local current=${1:-0}
-  num.isNumber "$current" || current=0
-  local total=${2:-100}
-  num.isNumber "$total" || total=100
-  current=$(num.min "$current" "$total")
-  local progress=$(($current * 100 / ${total}))
-  local bar="$(yes '#' | head -n ${progress} | tr -d '\n')"
-
-  [[ -z "$bar" ]] && bar='_'
-  printf "\r[%-100s] (%3d/%3d)" ${bar} ${current} ${total}
-}
