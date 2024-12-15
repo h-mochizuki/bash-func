@@ -5,9 +5,6 @@
 
 setup() {
   load $BATS_TEST_DIRNAME/../lib/qa
-
-  # テスト用にフォーマットを変更
-  LOG_FORMAT='[%level]%msg'
 }
 
 @test "qa.yn : empty" {
@@ -18,7 +15,7 @@ setup() {
   [ "${output}" == '' ]
 }
 
-@test "qa.yn y" {
+@test "qa.yn : y" {
   run qa.yn <<<'y'
   echo "status: ${status}"
   echo "output: ${output}"
@@ -26,7 +23,7 @@ setup() {
   [ "${output}" == '' ]
 }
 
-@test "qa.yn yes" {
+@test "qa.yn : yes" {
   run qa.yn <<<'yes'
   echo "status: ${status}"
   echo "output: ${output}"
@@ -34,7 +31,7 @@ setup() {
   [ "${output}" == '' ]
 }
 
-@test "qa.yn Yes" {
+@test "qa.yn : Yes" {
   run qa.yn <<<'Yes'
   echo "status: ${status}"
   echo "output: ${output}"
@@ -43,7 +40,7 @@ setup() {
   [ "${output}" == '' ]
 }
 
-@test "qa.yn n" {
+@test "qa.yn : n" {
   run qa.yn <<<'n'
   echo "status: ${status}"
   echo "output: ${output}"
@@ -51,7 +48,7 @@ setup() {
   [ "${output}" == '' ]
 }
 
-@test "qa.yn other" {
+@test "qa.yn : other" {
   run qa.yn <<<'other'
   echo "status: ${status}"
   echo "output: ${output}"
@@ -59,7 +56,7 @@ setup() {
   [ "${output}" == '' ]
 }
 
-@test "qa.checkbox empty" {
+@test "qa.checkbox : empty" {
   run qa.checkbox
   echo "status: ${status}"
   echo "output: ${output}"
@@ -67,7 +64,7 @@ setup() {
   [ "${output}" == '' ]
 }
 
-@test "qa.checkbox simple" {
+@test "qa.checkbox : simple" {
   run qa.checkbox 1 2 <<<"
 
 "
@@ -81,7 +78,7 @@ setup() {
 selected: ')
 }
 
-@test "qa.password empty" {
+@test "qa.password : empty" {
   run qa.password
   echo "status: ${status}"
   echo "output: ${output}"
@@ -89,7 +86,7 @@ selected: ')
   [ "${output}" == 'variable-name is required!' ]
 }
 
-@test "qa.password novalue" {
+@test "qa.password : novalue" {
   run qa.password "password_test" <<<''
   echo "status: ${status}"
   echo "output: ${output}"
