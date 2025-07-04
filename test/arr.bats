@@ -282,7 +282,7 @@ setup() {
   [ "${output}" == "" ]
 }
 
-@test "arr.take : not number" {
+@test "arr.take : no number" {
   run arr.take "ONE" "ONE"
   echo "status: ${status}"
   echo "output: ${output}"
@@ -291,7 +291,7 @@ setup() {
 }
 
 @test "arr.take : negative number" {
-  run arr.take "ONE" "ONE"
+  run arr.take -1 "ONE" "ONE"
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 1 ]

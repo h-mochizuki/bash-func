@@ -151,6 +151,9 @@ arr.take() {
   if [ $? -ge 2 ]; then
     return 1
   fi
+  if [[ "$limit" -lt 0 ]];then
+    return 1
+  fi
   local args=( "$@" )
   local size=${#args[@]}
   if [[ "$size" -lt "$limit" ]];then
