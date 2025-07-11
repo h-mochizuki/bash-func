@@ -473,3 +473,43 @@ setup() {
   [ "$status" -eq 0 ]
   [ "${output}" == '5.5' ]
 }
+
+@test "num.average : empty" {
+  run num.average
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '0' ]
+}
+
+@test "num.average : all illegal" {
+  run num.average a b c
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '0' ]
+}
+
+@test "num.average : single value" {
+  run num.average 42
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '42' ]
+}
+
+@test "num.average : negative and decimal" {
+  run num.average -1.5 2.5
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '0.5' ]
+}
+
+@test "num.average : mix illegal and valid" {
+  run num.average 1 a 2 b 3
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '2' ]
+}
