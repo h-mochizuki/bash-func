@@ -394,6 +394,46 @@ setup() {
   [ "${output}" == '1' ]
 }
 
+@test "num.max : decimal values" {
+  run num.max 1.1 2.2 3.3
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '3.3' ]
+}
+
+@test "num.max : negative values" {
+  run num.max -1 -2 -3
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '-1' ]
+}
+
+@test "num.max : mix negative and decimal" {
+  run num.max -1.5 0 2.5
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '2.5' ]
+}
+
+@test "num.max : all illegal" {
+  run num.max a b c
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "num.max : mix illegal and valid" {
+  run num.max 1 a 2 b 3
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '3' ]
+}
+
 @test "num.min : empty" {
   run num.min
   echo "status: ${status}"
@@ -448,6 +488,46 @@ setup() {
   echo "output: ${output}"
   [ "$status" -eq 0 ]
   [ "${output}" == '-1' ]
+}
+
+@test "num.min : decimal values" {
+  run num.min 1.1 2.2 3.3
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '1.1' ]
+}
+
+@test "num.min : negative values" {
+  run num.min -1 -2 -3
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '-3' ]
+}
+
+@test "num.min : mix negative and decimal" {
+  run num.min -1.5 0 2.5
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '-1.5' ]
+}
+
+@test "num.min : all illegal" {
+  run num.min a b c
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '' ]
+}
+
+@test "num.min : mix illegal and valid" {
+  run num.min 1 a 2 b 3
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '1' ]
 }
 
 @test "num.average : 1 0 -1 => 0" {
