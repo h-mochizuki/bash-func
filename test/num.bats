@@ -49,6 +49,20 @@ setup() {
   [ "$status" -eq 0 ]
 }
 
+@test "num.isInteger - true : zero" {
+  run num.isInteger "0"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+}
+
+@test "num.isInteger - false : negative decimal" {
+  run num.isInteger "-1.0"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 1 ]
+}
+
 @test "num.isNumber - false : empty" {
   run num.isNumber
   echo "status: ${status}"
@@ -93,6 +107,20 @@ setup() {
 
 @test "num.isNumber - true : integer" {
   run num.isNumber "123456"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+}
+
+@test "num.isNumber - true : zero" {
+  run num.isNumber "0"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+}
+
+@test "num.isNumber - true : negative zero" {
+  run num.isNumber "-0"
   echo "status: ${status}"
   echo "output: ${output}"
   [ "$status" -eq 0 ]
@@ -592,4 +620,20 @@ setup() {
   echo "output: ${output}"
   [ "$status" -eq 0 ]
   [ "${output}" == '2' ]
+}
+
+@test "num.average : zeroes" {
+  run num.average 0 0 0
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '0' ]
+}
+
+@test "num.average : negative zeroes" {
+  run num.average -0 -0 -0
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '0' ]
 }
