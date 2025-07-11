@@ -175,6 +175,9 @@ arr.drop() {
   if [ $? -ge 2 ]; then
     return 1
   fi
+  if [[ "$size" -lt 0 ]]; then
+    return 1
+  fi
   local args=( "$@" )
   local limit=${#args[@]}
   if [[ "$size" -lt "$limit" ]];then

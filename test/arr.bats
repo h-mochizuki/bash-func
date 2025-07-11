@@ -289,7 +289,7 @@ setup() {
 }
 
 @test "arr.tail : empty" {
-  run arr.cdr
+  run arr.tail
   echo "status: ${status}"
   echo "output: ${output}"
   echo "err: ${err}"
@@ -299,7 +299,7 @@ setup() {
 }
 
 @test "arr.tail : has 1 element" {
-  run arr.cdr "ONE"
+  run arr.tail "ONE"
   echo "status: ${status}"
   echo "output: ${output}"
   echo "err: ${err}"
@@ -309,7 +309,7 @@ setup() {
 }
 
 @test "arr.tail : has more element" {
-  run arr.cdr "ONE" "TWO" "THREE"
+  run arr.tail "ONE" "TWO" "THREE"
   echo "status: ${status}"
   echo "output: ${output}"
   echo "err: ${err}"
@@ -433,8 +433,8 @@ setup() {
   echo "status: ${status}"
   echo "output: ${output}"
   echo "err: ${err}"
-  [ "$status" -eq 0 ]
-  [ "${output}" == "TWO" ]
+  [ "$status" -eq 1 ]
+  [ "${output}" == "" ]
   [ "${err}" == "" ]
 }
 
@@ -478,6 +478,16 @@ setup() {
   [ "${err}" == "" ]
 }
 
+
+@test "arr.drop : drop negative over-size elements" {
+  run arr.drop -10 "ONE" "TWO" "THREE"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  echo "err: ${err}"
+  [ "$status" -eq 1 ]
+  [ "${output}" == "" ]
+  [ "${err}" == "" ]
+}
 @test "arr.uniq : empty" {
   run arr.uniq
   echo "status: ${status}"
