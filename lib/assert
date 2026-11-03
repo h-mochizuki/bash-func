@@ -11,7 +11,7 @@ source "${base}/file"
 # ----------------
 assert.isRoot() {
   # root権限を持つかを返します
-  # param1? ユーザ名
+  # param1 ユーザ名（デフォルト: 実行ユーザ）
   # returnCd 0:root権限を持つ 1:root権限を持たない
   [ "$(id -u ${1:-$(whoami)})" == "0" ]
 }
@@ -70,8 +70,8 @@ assert.exec() {
 assert.retry() {
   # 渡されたコマンドを実行して、エラーだった場合には指定回数繰返します
   # 最後までエラーの場合は全体の処理を終了します
-  # opt: n 繰り返し回数（デフォルト：5 回）
-  # opt: w 繰返し間隔（デフォルト：1秒）
+  # opt: n 繰り返し回数（デフォルト: 5 回）
+  # opt: w 繰返し間隔（デフォルト: 1秒）
   # param1+ 実行コマンド
   # exitCd 1:処理エラー
   local OPTIND
@@ -166,12 +166,13 @@ assert.unlock() {
 assert.lock() {
   # ロックファイルを作成します
   # 既にファイルがある場合は、指定時間だけ待機します
-  # opt: w タイムアウト秒数（デフォルト：10秒）
-  # param1 ロックファイル（デフォルト：呼び出し元Bashソースファイル）
-  # returnCd 0:正常 1: タイムアウト秒数指定エラー 124:タイムアウトエラー
+  # opt: w タイムアウト秒数（デフォルト: 10秒）
+  # param1 ロックファイル（デフォルト: 呼び出し元Bashソースファイル）
+  # returnCd 0:正常 1:タイムアウト秒数指定エラー 124:タイムアウトエラー
   # ----
   # サブシェルから抜けることで自動ロック解除を行います。
   # ロックファイルは用途に応じて指定します。
+  # usage)
   # (
   #   assert.lock 'lockme.lock'
   #   # 何かの処理
@@ -196,10 +197,12 @@ assert.lock() {
 
 assert.progress() {
   # プログレスバーを表示します
-  # param1 進捗率(0～100の数値)
-  # stream1 進捗率(0～100の数値)
-  # 実行例:
-  #  (echo 10; sleep 1;echo 50;sleep 1;echo 100) | assert.progress
+  # input-stream 進捗率（0～100の数値）
+  # param1 進捗率（0～100の数値）
+  # stdout プログレスバー
+  # ----
+  # usage)
+  # (echo 10; sleep 1;echo 50;sleep 1;echo 100) | assert.progress
   local total=100
   local width=$(( $(tput cols) -10 ))
   ([[ -t 0 ]] && echo "$@" || cat -) | while read -r l; do

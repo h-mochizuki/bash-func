@@ -13,6 +13,8 @@ sub.new() (
   # 設定ファイルは親フォルダを遡って探索されます
   # 設定ファイルが見つからない場合、カレントディレクトリにファイルを作成します
   # param1 設定ファイル名（デフォルト: .subrc）
+  # stdout 設定ファイルを作成した場合はその旨のメッセージ
+  # returnCd サブプロンプトの終了コード
   local initfile="${1:-.subrc}"
   local ifile="$(file.isBelongedTo ${initfile})"
   [[ "x${ifile}" == "x" ]] && {
@@ -31,6 +33,7 @@ EOF
 sub.temp() (
   # 使い捨てのサブプロンプト環境を開始します
   # param1 設定ファイル名（デフォルト: .subrc）
+  # returnCd サブプロンプトの終了コード
   local initfile="${1:-.subrc}"
   initfile="$(file.isBelongedTo ${initfile})"
   unset tmpfile

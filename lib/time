@@ -17,7 +17,8 @@ time.elapsed() {
   # コマンド処理時間計測を実施します
   # param1 コマンド
   # param2+ コマンドパラメータ
-  # return コマンド処理時間
+  # globals ELAPSED_FORMAT（参照）
+  # stdout コマンド処理時間
   # returnCd コマンド処理結果
 
   # 実行前準備
@@ -51,7 +52,7 @@ time.diffTimestamp() {
   # param1 開始タイムスタンプ
   # param2 終了タイムスタンプ
   # param3 変換フォーマット
-  # return 差分
+  # stdout 差分
   # returnCd 0:正常終了 1:タイムスタンプが数値以外
   local fromSec="$1"
   expr "${fromSec/./}" + 1 >/dev/null 2>&1
@@ -78,19 +79,19 @@ alias time.diff='time.diffTimestamp'
 
 time.currentTimeSec() {
   # 秒までを含めたタイムスタンプを取得します
-  # return タイムスタンプ（秒レベル）
+  # stdout タイムスタンプ（秒レベル）
   echo $(date +%s)
 }
 
 time.currentTimeMillis() {
   # ミリ秒までを含めたタイムスタンプを取得します
-  # return タイムスタンプ（ミリ秒レベル）
+  # stdout タイムスタンプ（ミリ秒レベル）
   echo $(date +%s%3N)
 }
 
 time.currentTimeNanos() {
   # ナノ秒までを含めたタイムスタンプを取得します
-  # return タイムスタンプ（ナノ秒レベル）
+  # stdout タイムスタンプ（ナノ秒レベル）
   echo $(date +%s%N)
 }
 
@@ -98,7 +99,7 @@ time.sec2Date() {
   # 秒レベルのタイムスタンプを日付型に変換します
   # param1 タイムスタンプ（秒レベル）
   # param2 日付変換フォーマット
-  # return 変換後日付文字列
+  # stdout 変換後日付文字列
   # returnCd 0:正常終了 1:タイムスタンプが数値ではない
   time.nanos2Date "${1}000000000" "$2"
 }
@@ -107,7 +108,7 @@ time.millis2Date() {
   # ミリ秒レベルのタイムスタンプを日付型に変換します
   # param1 タイムスタンプ（ミリ秒レベル）
   # param2 日付変換フォーマット
-  # return 変換後日付文字列
+  # stdout 変換後日付文字列
   # returnCd 0:正常終了 1:タイムスタンプが数値ではない
   time.nanos2Date "${1}000000" "$2"
 }
@@ -116,7 +117,7 @@ time.nanos2Date() {
   # ナノ秒レベルのタイムスタンプを日付型に変換します
   # param1 タイムスタンプ（ナノ秒レベル）
   # param2 日付変換フォーマット
-  # return 変換後日付文字列
+  # stdout 変換後日付文字列
   # returnCd 0:正常終了 1:タイムスタンプが数値ではない
   local timestamp=${1};shift
   expr "${timestamp}" + 1 >/dev/null 2>&1
@@ -139,8 +140,8 @@ time.nanos2Date() {
 time.timeout() {
   # 指定秒数までに処理が終わらなかったらエラー終了します
   # param1 指定秒数
-  # param2+ 実行したい処理（bash -c 'do somethings'が便利）
-  # return 実行結果
+  # param2+ 実行したい処理（bash -c 'do something'が便利）
+  # stdout 実行結果
   # returnCd 0:正常終了 124:タイムアウト
   timeout "$@"
 }
@@ -148,8 +149,8 @@ time.timeout() {
 time.delay() {
   # 指定秒数後に処理を実行します
   # param1 指定秒数
-  # param2+ 実行したい処理（bash -c 'do somethings'が便利）
-  # return 実行結果
+  # param2+ 実行したい処理（bash -c 'do something'が便利）
+  # stdout 実行結果
   # returnCd 0:正常終了 それ以外:エラー
   (
     sleep ${1:-1};shift

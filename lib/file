@@ -73,7 +73,7 @@ dir.isNotEmpty() {
 file.absolutePath() {
   # 指定されたファイルの絶対パスを返します
   # param1+ ファイルパス
-  # return 絶対パス
+  # stdout 絶対パス
   local p
   local arr
   arr=()
@@ -88,7 +88,7 @@ file.absolutePath() {
 file.size() {
   # 指定されたファイルのバイトサイズを返します
   # param1 ファイルパス
-  # return ファイルサイズ
+  # stdout ファイルサイズ
   # returnCd 0:正常 1:ファイルが存在しない
   local p
   for p in "$@";do
@@ -106,7 +106,7 @@ file.stream() {
   # 指定されたファイルもしくは入力ストリームをストリームとして返します
   # input-stream 入力ストリーム
   # param1+ ファイルパス
-  # return ストリーム
+  # stdout ストリーム
   if [ -t 0 ]; then
     [[ "$#" -ne 0 ]] && cat "$@"
   else
@@ -117,8 +117,8 @@ file.stream() {
 file.isBelongedTo() {
   # ディレクトリを遡り、対象ファイルがあるかを返します
   # param1 検索対象ファイル
-  # return 対象ファイルパス
-  # returnCd 0:ファイルがあった 1: ファイルがなかった
+  # stdout 対象ファイルパス
+  # returnCd 0:ファイルがあった 1:ファイルがなかった
   [[ "$#" -eq 0 ]] && return 1
   local target="${1}"
   local cur="$(pwd)"
@@ -136,7 +136,7 @@ file.isSame() {
   # 2つのファイルもしくはディレクトリが同じものかを比較します
   # param1 比較対象ファイル1
   # param2 比較対象ファイル2
-  # returnCd 0:一致した それ以外: 一致しなかった
+  # returnCd 0:一致した それ以外:一致しなかった
   [[ ! "$#" -eq 2 ]] && return 1
   file.isDirectory "${1}"
   if [[ "$?" -eq 0 ]];then
@@ -165,7 +165,7 @@ file.eval() {
   # ファイルに含まれる環境変数やスクリプトを評価した文字列を返します
   # input-stream 入力ストリーム
   # param1 ファイルパス
-  # return 環境変数やスクリプトを評価した文字列
+  # stdout 環境変数やスクリプトを評価した文字列
   if [ -t 0 ]; then
     [[ "$#" -ne 0 ]] && cat "$1"
   else
@@ -176,7 +176,7 @@ file.eval() {
 file.eachLine() {
   # ファイル内容を一行ずつ出力します
   # param1 ファイルパス
-  # return 一行ずつのファイル内容
+  # stdout 一行ずつのファイル内容
   for line in "$(cat $@)";do
     echo "$line"
   done
@@ -185,7 +185,7 @@ file.eachLine() {
 dir.tree() (
   # ディレクトリ階層構造を表示します
   # param1 ファイルパス
-  # return ディレクトリ階層構造
+  # stdout ディレクトリ階層構造
   cd ${1:-.} >/dev/null 2>&1 && {
     pwd
     find . | sort | sed '1d;s/^\.//;s/\/\([^/]*\)$/|- \1/;s/\/[^/|]*/|  /g'

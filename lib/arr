@@ -12,7 +12,7 @@ arr.join() {
   # opt: p プレフィックス（接頭辞）
   # opt: s サフィックス（接尾辞）
   # param1+ 配列
-  # return 配列を連結した文字列
+  # stdout 配列を連結した文字列
   local OPTIND
   local delimiter=''
   local prefix=''
@@ -41,7 +41,7 @@ arr.join() {
 arr.size() {
   # 指定された配列の要素数を返します
   # param1+ 配列要素
-  # return 要素数
+  # stdout 要素数
   echo "$#"
 }
 
@@ -56,7 +56,7 @@ arr.indexOf() {
   # 指定された要素が配列のどこにあるかを返します
   # param1 指定要素
   # param2+ 配列要素
-  # return 配列インデックス
+  # stdout 配列インデックス
   # returnCd 0:配列に存在した 1:配列に存在しなかった
   if [[ "$#" -eq 0 ]];then
     echo -1
@@ -102,21 +102,21 @@ arr.contains() {
 arr.car() {
   # 配列の先頭を返します
   # param1+ 配列要素
-  # return 配列の先頭要素
+  # stdout 配列の先頭要素
   echo "$1"
 }
 
 arr.head() {
   # 配列の先頭を返します
   # param1+ 配列要素
-  # return 配列の先頭要素
+  # stdout 配列の先頭要素
   arr.car "$@"
 }
 
 arr.cdr() {
   # 配列の先頭以降を返します
   # param1+ 配列要素
-  # return 配列の先頭以降の要素
+  # stdout 配列の先頭以降の要素
   shift
   echo "$@"
 }
@@ -124,14 +124,14 @@ arr.cdr() {
 arr.tail() {
   # 配列の先頭以降を返します
   # param1+ 配列要素
-  # return 配列の先頭以降の要素
+  # stdout 配列の先頭以降の要素
   arr.cdr "$@"
 }
 
 arr.last() {
   # 配列の最後の要素を返します
   # param1+ 配列要素
-  # return 配列の最後の要素
+  # stdout 配列の最後の要素
   local args=( "$@" )
   local size=${#args[@]}
   if [[ "$size" -gt 0 ]];then
@@ -144,7 +144,7 @@ arr.take() {
   # 指定数よりも要素が少ない場合は、あるだけを返します
   # param1 指定要素数
   # param2+ 配列要素
-  # return 指定された数分の要素
+  # stdout 指定された数分の要素
   # returnCd 0:正常 1:指定要素数が不正
   local limit="$1";shift
   expr "${limit}" + 1 >/dev/null 2>&1
@@ -168,7 +168,7 @@ arr.drop() {
   # 指定数よりも要素が少ない場合は、空を返します
   # param1 指定要素数
   # param2+ 配列要素
-  # return 指定された数分除外した要素
+  # stdout 指定された数分除外した要素
   # returnCd 0:正常 1:指定要素数が不正
   local size="$1";shift
   expr "${size}" + 1 >/dev/null 2>&1
@@ -187,7 +187,8 @@ arr.drop() {
 
 arr.uniq() {
   # 配列から重複を取り除きます
-  # return 重複を取り除いた配列
+  # param1+ 配列要素
+  # stdout 重複を取り除いた配列
   local elements=( "$@" )
   local e
   for e in "${elements[@]}";do
@@ -200,7 +201,7 @@ arr.excludes() {
   # opt: c 除外対象文字列
   # opt: r 除外対象正規表現
   # param1+ 配列
-  # return 指定要素を取り除いた配列
+  # stdout 指定要素を取り除いた配列
   local args=("$@")
   [[ -t 0 ]] || {
     while read line; do

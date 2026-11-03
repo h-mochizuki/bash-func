@@ -37,6 +37,9 @@ export SYSTEM_LOGGING='FALSE'
 # ----------------
 log.settings() {
   # 現在の設定値を表示します
+  # globals LOG_DIR, LOG_FILE, TIMESTAMP_FORMAT, LOG_FORMAT, DATETIME_FORMAT,
+  #         LINE_SEPARATOR, OUTPUT_LOGGING, SYSTEM_LOGGING（参照）
+  # stdout 現在の設定値
   echo "LOG_DIR=$LOG_DIR"
   echo "LOG_FILE=$LOG_FILE"
   echo "TIMESTAMP_FORMAT=$TIMESTAMP_FORMAT"
@@ -49,8 +52,9 @@ log.settings() {
 
 log.setAbort() {
   # 異常終了時のエラー表示設定
-  # param1 エラー表示フラグ(on | off)
-  #--
+  # param1 エラー表示フラグ（on | off, デフォルト: on）
+  # stdout 設定結果
+  # ----
   # usage) log.setAbort [on|off]
   local flg='ON'
   if [ "$#" -gt 0 ];then
@@ -69,7 +73,7 @@ log.setAbort() {
 }
 
 log.abort() {
-  # 異常終了時のログ出力
+  # 異常終了時のログを標準エラー出力に出力します
   log.logger 'FATAL' '=================' 1>&2
   log.logger 'FATAL' '==== ABORTED ====' 1>&2
   log.logger 'FATAL' '=================' 1>&2
@@ -81,8 +85,9 @@ log.setTrace() {
   # 必要なシェルなどで有効にするとコマンドレベルで実行状況を出力します
   # trapを使用しているため、関数スコープで動作します
   # ※ 通常はこれを使用するよりも 'bash -x command' を使用した方が効果的です
-  # param1 トレースフラグ(on | off)
-  #--
+  # param1 トレースフラグ（on | off, デフォルト: on）
+  # stdout 設定結果
+  # ----
   # usage) log.setTrace [on|off]
   local flg='ON'
   if [ "$#" -gt 0 ];then
@@ -120,8 +125,10 @@ log.logger() {
   # param1 ログレベル
   # param2 ログテンプレート
   # param3+ 置換パラメータ
+  # globals LOG_FORMAT, DATETIME_FORMAT, LINE_SEPARATOR, OUTPUT_LOGGING, SYSTEM_LOGGING（参照）
+  # stdout 整形したログ
   # returnCd 0:正常 9:パラメータエラー
-  #--
+  # ----
   # usage) log.logger '[INFO|WARN|ERROR]' '{} is {}.' 'This' 'mine'
   if [ "$#" -lt 1 ];then
     errorLog "Illegal palameters exception: You should give log-level and message or more parameters."
@@ -177,6 +184,7 @@ log.info() {
   # INFOログ
   # param1 ログテンプレート
   # param2+ 置換パラメータ
+  # ----
   # usage)
   # log.info "This is {}." "a pen" => '[INFO]This is a pen.'
   log.logger 'INFO' "$@"
@@ -186,6 +194,7 @@ log.warn() {
   # WARNログ
   # param1 ログテンプレート
   # param2+ 置換パラメータ
+  # ----
   # usage)
   # log.warn "This is {}." "a pen" => '[WARN]This is a pen.'
   log.logger 'WARN' "$@" 1>&2
@@ -195,6 +204,7 @@ log.error() {
   # ERRORログ
   # param1 ログテンプレート
   # param2+ 置換パラメータ
+  # ----
   # usage)
   # log.error "This is {}." "a pen" => '[ERROR]This is a pen.'
   log.logger 'ERROR' "$@" 1>&2
@@ -203,8 +213,11 @@ log.error() {
 log.to() {
   # 対象処理を実施してログをファイルに出力します
   # input-stream 入力ストリーム
-  # param1 ログファイル名（デフォルト： <ファイル名>_<タイムスタンプ>.log）
+  # param1 ログファイル名（デフォルト: <ファイル名>_<タイムスタンプ>.log）
   # param2+ 対象処理（入力ストリーム優先）
+  # globals LOG_FILE, LOG_DIR, TIMESTAMP_FORMAT（参照）
+  # stdout 対象処理の出力
+  # ----
   # usage1)
   # {
   #  log.info "message"

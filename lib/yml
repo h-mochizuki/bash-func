@@ -10,7 +10,7 @@ __yml.stream() {
   # YAMLをインデント/キー/バリューで区切ったストリームを返します
   # input-stream 入力ストリーム
   # param1 入力ファイル
-  # return YAMLをインデント/キー/バリューで区切ったストリーム
+  # stdout YAMLをインデント/キー/バリューで区切ったストリーム
   local s='[[:space:]]*'
   local c='[[:space:]]\+#.*'
   local w='[a-zA-Z0-9_]*[a-zA-Z0-9_\.-]*'
@@ -40,7 +40,7 @@ __yml.parse() {
   # 指定されたフォーマットで出力します
   # input-stream 入力ストリーム
   # param1+ 入力オプション
-  # return 解析結果
+  # stdout 解析結果
   # ----
   # オプション
   #   --prefix        : キーにつける接頭語
@@ -138,7 +138,7 @@ yml.toEnv() {
   # input-stream 入力ストリーム
   # param1 入力ファイル
   # param2 追加接頭語
-  # return 環境変数方式のYAML内容
+  # stdout 環境変数方式のYAML内容
   local prefix="$1"
   [[ -t 0 ]] && prefix="$2"
   __yml.stream "$@" | \
@@ -159,7 +159,7 @@ yml.toProperties() {
   # input-stream 入力ストリーム
   # param1 入力ファイル
   # param2 追加接頭語
-  # return propertiesファイル形式に変換したYAML内容
+  # stdout propertiesファイル形式に変換したYAML内容
   local prefix="$1"
   [[ -t 0 ]] && prefix="$2"
   __yml.stream "$@" | \
@@ -177,7 +177,7 @@ yml.grep() {
   # input-stream 入力ストリーム
   # param1 入力ファイル
   # param2 検索文字列
-  # return propertiesファイル形式に変換したYAML内容の検索結果
+  # stdout propertiesファイル形式に変換したYAML内容の検索結果
   [[ -t 0 ]] && shift
   local params="$@"
   [[ -z "$params" ]] && return 0

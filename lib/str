@@ -13,7 +13,7 @@ str.indexOf() {
   # input-stream 入力ストリーム
   # param1 検索対象文字列
   # param2 入力文字列
-  # return 検索対象文字列が何文字目にあたるか
+  # stdout 検索対象文字列が何文字目にあたるか
   # returnCd 0:文字列が見つかった 1:文字列が見つからなかった
   local idx
   if [ -t 0 ]; then
@@ -68,7 +68,7 @@ str.match() {
   # パターンが入力文字列にマッチするかを判定し、判定結果を返します
   # param1 パターン
   # param2 入力文字列
-  # return マッチした文字列を格納した配列
+  # stdout マッチした文字列を格納した配列
   # returnCd 0:文字列が含まれている 1:文字列が含まれていない
   if [[ "$#" -ge 2 ]];then
     local regex="$1";shift
@@ -85,7 +85,7 @@ str.stream() {
   # 入力引数、もしくは入力ストリームをストリームとして返します
   # input-stream 入力ストリーム
   # param1+ 入力引数
-  # return ストリーム
+  # stdout ストリーム
   [[ -t 0 ]] && echo "$@" || cat -
 }
 
@@ -93,7 +93,7 @@ str.toLower() {
   # 入力文字列、もしくは入力ストリームを小文字に変換します
   # input-stream 入力ストリーム
   # param1+ 文字列
-  # return 小文字に変換した文字列
+  # stdout 小文字に変換した文字列
   str.stream "$@" | tr '[:upper:]' '[:lower:]'
 }
 
@@ -101,7 +101,7 @@ str.toUpper() {
   # 入力文字列、もしくは入力ストリームを大文字に変換します
   # input-stream 入力ストリーム
   # param1+ 文字列
-  # return 大文字に変換した文字列
+  # stdout 大文字に変換した文字列
   str.stream "$@" | tr '[:lower:]' '[:upper:]'
 }
 
@@ -109,7 +109,7 @@ str.toLf() {
   # 改行コードを CRLF -> LF 変換します
   # input-stream 入力ストリーム
   # param1+ 文字列
-  # return 改行コードを LF に変換した文字列
+  # stdout 改行コードを LF に変換した文字列
   str.stream "$@" | tr -d \\r
 }
 
@@ -117,14 +117,14 @@ str.toCrLf() {
   # 改行コードを LF -> CRLF 変換します
   # input-stream 入力ストリーム
   # param1+ 文字列
-  # return 改行コードを LF に変換した文字列
+  # stdout 改行コードを CRLF に変換した文字列
   str.stream "$@" | str.toLf | sed 's/$/\r/g'
 }
 
 str.charset() {
   # 文字コードを返します
   # param1+ ファイル名
-  # return 文字コード
+  # stdout 文字コード
   local p c
   for p in "$@";do
     c=$(file -i "${p}" | sed -e 's/^.*=//' | str.toUpper)
@@ -142,6 +142,7 @@ str.convert() {
   # opt: t 変更後文字コード（デフォルト: UTF-8）
   # opt: l 変更後改行コード（LF | CRLF, デフォルト: LF）
   # param1+ ファイル名
+  # stdout 変換後のファイル内容
   local OPTIND
   local p
   local from
@@ -190,8 +191,8 @@ str.isNumber() {
 str.times() {
   # 文字列を指定回数繰り返します
   # param1 文字列
-  # param2 指定回数（デフォルト1回）
-  # return 指定回数繰り返された文字列
+  # param2 指定回数（デフォルト: 1回）
+  # stdout 指定回数繰り返された文字列
   printf "%*s" ${2:-1} | sed -e "s/ /${1:-}/g"
 }
 
@@ -199,7 +200,7 @@ str.evalstr() {
   # 入力内容に含まれる環境変数やスクリプトを評価した文字列を返します
   # input-stream 入力ストリーム
   # param1 対象文字列
-  # return 環境変数やスクリプトを評価した文字列
+  # stdout 環境変数やスクリプトを評価した文字列
   str.stream "$@" | eval "echo -e \"$(cat)\""
 }
 
@@ -207,7 +208,7 @@ str.evalfile() {
   # ファイルに含まれる環境変数やスクリプトを評価した文字列を返します
   # input-stream 入力ストリーム
   # param1 ファイルパス
-  # return 環境変数やスクリプトを評価した文字列
+  # stdout 環境変数やスクリプトを評価した文字列
   if [ -t 0 ]; then
     [[ "$#" -ne 0 ]] && cat "$1"
   else
@@ -219,6 +220,7 @@ str.initial() {
   # 頭文字を返します
   # input-stream 入力ストリーム
   # param1+ 対象文字列
+  # stdout 頭文字
   if [ -t 0 ]; then
     for arg in "$@"; do
       echo "$arg" | sed -e 's/^\(.\).*$/\1/'
@@ -232,6 +234,7 @@ str.trim() {
   # 前後の空白を除去します
   # input-stream 入力ストリーム
   # param1+ 対象文字列
+  # stdout 前後の空白を除去した文字列
   if [ -t 0 ]; then
     for arg in "$@"; do
       echo "$arg" | sed -e 's/^\s*//' -e 's/\s*$//'
@@ -246,6 +249,8 @@ str.take() {
   # input-stream 入力ストリーム
   # param1 指定文字数（負数で末尾から）
   # param2+ 対象文字列
+  # stdout 切り出した文字列（指定文字数が不正な場合は対象文字列そのまま）
+  # returnCd 0:正常 1:指定文字数が不正
   str.isInteger "$1" >/dev/null 2>&1
   [[ "$?" -ne 0 ]] && str.stream "$@" && return 1
   local justified="^\(.\{${1#-}\}\).*"
@@ -260,6 +265,8 @@ str.fill() {
   # param1 指定文字数（負数で右寄せ）
   # param2 指定文字
   # param3+ 対象文字列
+  # stdout 指定文字で満たした文字列
+  # returnCd 0:正常 1:パラメータ不正
   [[ "$#" -eq 0 ]] && return 1
   str.isInteger "$1" ||  return 1
   local justified="left"
@@ -303,7 +310,7 @@ str.base64() {
 str.hr() (
   # ターミナルに水平線を引きます
   # param1 横幅
-  # return 水平線
+  # stdout 水平線
   local width=80
   $(tput cols 2>/dev/null 1>/dev/null) && {
     width=$(tput cols);
@@ -314,7 +321,7 @@ str.hr() (
 str.bold() {
   # 入力内容の表示を太字にします
   # param1+ 太字にしたい文字列
-  # return 太字にした文字列
+  # stdout 太字にした文字列
   echo -e "\033[1m${@}\033[0m"
 }
 alias str.f.b="str.bold"
@@ -322,7 +329,7 @@ alias str.f.b="str.bold"
 str.format.italic() {
   # 入力内容の表示をイタリックにします
   # param1+ イタリックにしたい文字列
-  # return イタリックにした文字列
+  # stdout イタリックにした文字列
   echo -e "\033[3m${@}\033[0m"
 }
 alias str.f.i="str.format.italic"
@@ -330,7 +337,7 @@ alias str.f.i="str.format.italic"
 str.format.underline() {
   # 入力内容にアンダーラインを引きます
   # param1+ アンダーラインを追加したい文字列
-  # return アンダーラインを追加した文字列
+  # stdout アンダーラインを追加した文字列
   echo -e "\033[4m${@}\033[0m"
 }
 alias str.f.u="str.format.underline"
@@ -338,7 +345,7 @@ alias str.f.u="str.format.underline"
 str.format.strikethrough() {
   # 入力内容に取り消し線を引きます
   # param1+ 取り消し線を追加したい文字列
-  # return 取り消し線を追加した文字列
+  # stdout 取り消し線を追加した文字列
   echo -e "\033[9m${@}\033[0m"
 }
 alias str.f.d="str.format.strikethrough"
@@ -346,7 +353,7 @@ alias str.f.d="str.format.strikethrough"
 str.color.gray() {
   # 入力を灰字にします
   # param1+ 灰字にしたい文字列
-  # return 灰字にした文字列
+  # stdout 灰字にした文字列
   echo -e "\033[30m${@}\033[0m"
 }
 alias str.c.gray="str.color.gray"
@@ -354,7 +361,7 @@ alias str.c.gray="str.color.gray"
 str.color.red() {
   # 入力を赤字にします
   # param1+ 赤字にしたい文字列
-  # return 赤字にした文字列
+  # stdout 赤字にした文字列
   echo -e "\033[31m${@}\033[0m"
 }
 alias str.c.r="str.color.red"
@@ -362,7 +369,7 @@ alias str.c.r="str.color.red"
 str.color.green() {
   # 入力を緑字にします
   # param1+ 緑字にしたい文字列
-  # return 緑字にした文字列
+  # stdout 緑字にした文字列
   echo -e "\033[32m${@}\033[0m"
 }
 alias str.c.g="str.color.green"
@@ -370,7 +377,7 @@ alias str.c.g="str.color.green"
 str.color.yellow() {
   # 入力を黄字にします
   # param1+ 黄字にしたい文字列
-  # return 黄字にした文字列
+  # stdout 黄字にした文字列
   echo -e "\033[33m${@}\033[0m"
 }
 alias str.c.y="str.color.yellow"
@@ -378,7 +385,7 @@ alias str.c.y="str.color.yellow"
 str.color.blue() {
   # 入力を青字にします
   # param1+ 青字にしたい文字列
-  # return 青字にした文字列
+  # stdout 青字にした文字列
   echo -e "\033[34m${@}\033[0m"
 }
 alias str.c.b="str.color.blue"
@@ -386,7 +393,7 @@ alias str.c.b="str.color.blue"
 str.color.purple() {
   # 入力を紫字にします
   # param1+ 紫字にしたい文字列
-  # return 紫字にした文字列
+  # stdout 紫字にした文字列
   echo -e "\033[35m${@}\033[0m"
 }
 alias str.c.purple="str.color.purple"
@@ -395,7 +402,7 @@ str.rect() (
   # 四角形を描画します
   # param1 横幅
   # param2 高さ
-  # return 四角形
+  # stdout 四角形
   local w=${1:-20}
   [[ w -le 1 ]] && {
     str.times "-\n" ${2:-1}

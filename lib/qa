@@ -24,11 +24,11 @@ qa.yn() {
 
 qa.checkbox() (
   # 指定した選択肢から選択させます
-  # paramN+ 選択肢文言
   # opt: n 選択肢ではなく番号を返す
   # opt: o ひとつだけ選択
-  # opt: i カンマ区切りで選択済みの番号を入れる(0 始まり. oが指定された場合は後勝ち)
-  # return 選択された選択肢文言
+  # opt: i カンマ区切りで選択済みの番号を入れる（0 始まり。oが指定された場合は後勝ち）
+  # param1+ 選択肢文言
+  # stdout 選択された選択肢文言
   local OPTIND
   local cursor='\e[36m>\e[m'
   local selected='\e[36m*\e[m'
@@ -165,17 +165,18 @@ qa.checkbox() (
 
 qa.radio() {
   # 指定した選択肢からひとつだけ選択させます
-  # paramN+ 選択肢文言
   # opt: n 選択肢ではなく番号を返す
-  # opt: i カンマ区切りで選択済みの番号を入れる(0 始まり. 後勝ち)
-  # return 選択された選択肢文言
+  # opt: i カンマ区切りで選択済みの番号を入れる（0 始まり。後勝ち）
+  # param1+ 選択肢文言
+  # stdout 選択された選択肢文言
   qa.checkbox -o "$@"
 }
 
 qa.password() {
   # 指定した名前の変数に値を設定します
   # ただし、表示の際には * で表示されます
-  # param1 変数名
+  # param1 値を設定する変数名
+  # globals <param1で指定した変数>（設定）
   local variable=${1}
   local invisible=
   [[ -z "${variable}" ]] && {

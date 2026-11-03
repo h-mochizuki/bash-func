@@ -16,15 +16,17 @@ export TimeoutException=124
 #     関数定義
 # ----------------
 trycatch.example() {
+  # try / catch の使用例を表示します
+  # stdout 使用例スクリプト
   cat <<EOF
 #!/bin/bash
 # ===================
-# Try Catch Excample.
+# Try Catch Example.
 # ===================
 source ${base}/try-catch
 source ${base}/log
 
-# define exceptons
+# define exceptions
 export AnException=100
 
 # start with a try
@@ -52,7 +54,10 @@ EOF
 
 try() {
   # catch句にエラーを届けるための前処理を実施します
+  # globals SAVED_OPT_E（設定）
+  # ----
   # 後続処理では次のように処理を始めてください
+  # usage)
   # try
   # (
   #   echo "do something"
@@ -64,8 +69,12 @@ try() {
 catch() {
   # エラーが発生したかを後続に返します
   # エラーコードは EXCEPTION_CD として取得できます
+  # globals EXCEPTION_CD（設定）, SAVED_OPT_E（参照）
+  # returnCd 直前のコマンドの終了コード
+  # ----
   # 後続処理では次のように処理を始めてください
-  #   catch || { sub-shells }
+  # usage)
+  # catch || { sub-shells }
   export EXCEPTION_CD=$?
   (( $SAVED_OPT_E )) && set +e
   return "${EXCEPTION_CD}"
@@ -73,8 +82,9 @@ catch() {
 
 throw() {
   # エラーログ出力後に指定された終了コードで処理を終了します
-  # param1: 終了コード
-  # param2+: エラーログ内容
+  # param1 終了コード
+  # param2+ エラーログ内容
+  # exitCd 指定された終了コード
   local exitCd="${1}";shift
   if [[ ! -z "${exitCd+x}" ]] && [[ "${exitCd}" -ne 0 ]];then
     if [[ $# -ne 0 ]];then
