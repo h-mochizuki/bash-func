@@ -8,17 +8,18 @@
 # ----------------
 __yml.stream() {
   # YAMLをインデント/キー/バリューで区切ったストリームを返します
+  # 入力ファイルが指定された場合は、入力ストリームより優先します
   # input-stream 入力ストリーム
-  # param1 入力ファイル
+  # param1+ 入力ファイル（- は入力ストリーム。複数指定時は連結）
   # stdout YAMLをインデント/キー/バリューで区切ったストリーム
   local s='[[:space:]]*'
   local c='[[:space:]]\+#.*'
   local w='[a-zA-Z0-9_]*[a-zA-Z0-9_\.-]*'
   local l='[-]'
   local fs=$(echo @|tr @ '\034')
-  if [ -t 0 ]; then
-    [[ "$#" -ne 0 ]] && cat "$1"
-  else
+  if [[ "$#" -ne 0 ]];then
+    cat "$@"
+  elif [[ ! -t 0 ]];then
     cat -
   fi | \
   sed -ne "s|^\($s\):|\1|" \
@@ -135,12 +136,24 @@ yml.toEnv() {
   # YAMLを環境変数方式に変換します
   # 環境変数のキーにドットやハイフンは使用できないため
   # それらが使用されていた場合アンダースコアに変更されます
+  # opt: p 追加接頭語
   # input-stream 入力ストリーム
-  # param1 入力ファイル
-  # param2 追加接頭語
+  # param1+ 入力ファイル（- は入力ストリーム。複数指定時は連結。指定された場合は、入力ストリームより優先）
   # stdout 環境変数方式のYAML内容
-  local prefix="$1"
-  [[ -t 0 ]] && prefix="$2"
+  # ----
+  # usage)
+  # yml.toEnv -p 'APP_' config.yml
+  # cat config.yml | yml.toEnv -p 'APP_'
+  local OPTIND OPT
+  local prefix=''
+  while getopts p: OPT
+  do
+    case $OPT in
+      p) prefix=$OPTARG
+      ;;
+    esac
+  done
+  shift $((OPTIND - 1))
   __yml.stream "$@" | \
   __yml.parse \
     --illegal-chars '[\\.-]' \
@@ -156,12 +169,24 @@ yml.toProperties() {
   # YAMLをpropertiesファイル形式に変換します
   # propertyのキーにイコールは使用できないため
   # 使用されていた場合はドットに変更されます
+  # opt: p 追加接頭語
   # input-stream 入力ストリーム
-  # param1 入力ファイル
-  # param2 追加接頭語
+  # param1+ 入力ファイル（- は入力ストリーム。複数指定時は連結。指定された場合は、入力ストリームより優先）
   # stdout propertiesファイル形式に変換したYAML内容
-  local prefix="$1"
-  [[ -t 0 ]] && prefix="$2"
+  # ----
+  # usage)
+  # yml.toProperties -p 'app.' config.yml
+  # cat config.yml | yml.toProperties -p 'app.'
+  local OPTIND OPT
+  local prefix=''
+  while getopts p: OPT
+  do
+    case $OPT in
+      p) prefix=$OPTARG
+      ;;
+    esac
+  done
+  shift $((OPTIND - 1))
   __yml.stream "$@" | \
   __yml.parse \
     --illegal-chars '[=]' \
@@ -174,17 +199,25 @@ yml.grep() {
   # propertiesファイル形式に変換したYAML内容を検索します
   # propertyのキーにイコールは使用できないため
   # 使用されていた場合はドットに変更されます
+  # opt: f 入力ファイル（先頭に指定。- は入力ストリーム。複数回指定時は連結。指定された場合は、入力ストリームより優先）
   # input-stream 入力ストリーム
-  # param1 入力ファイル
-  # param2 検索文字列
+  # param1+ 検索条件（grep に渡す引数）
   # stdout propertiesファイル形式に変換したYAML内容の検索結果
-  [[ -t 0 ]] && shift
-  local params="$@"
-  [[ -z "$params" ]] && return 0
-  __yml.stream "$@" | \
+  # ----
+  # grep のオプションと区別するため、-f は getopts を使わず先頭のみ解釈します
+  # usage)
+  # yml.grep -f config.yml -i 'name'
+  # cat config.yml | yml.grep -i 'name'
+  local file=()
+  while [[ "${1-}" == "-f" ]];do
+    file+=("${2-}")
+    shift 2
+  done
+  [[ "$#" -eq 0 ]] && return 0
+  __yml.stream "${file[@]}" | \
   __yml.parse \
     --illegal-chars '[=]' \
     --key-separator '.' \
     --index-prefix '.' | \
-  grep ${params}
+  grep "$@"
 }

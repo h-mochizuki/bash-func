@@ -5,6 +5,7 @@
 base="$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)"
 source "${base}/log"
 source "${base}/file"
+source "${base}/str"
 
 # ----------------
 #     関数定義
@@ -197,6 +198,8 @@ assert.lock() {
 
 assert.progress() {
   # プログレスバーを表示します
+  # 進捗率（param1）の後に、入力ストリームの進捗率を順に表示します
+  # opt: n 入力ストリームを読まない
   # input-stream 進捗率（0～100の数値）
   # param1 進捗率（0～100の数値）
   # stdout プログレスバー
@@ -205,7 +208,7 @@ assert.progress() {
   # (echo 10; sleep 1;echo 50;sleep 1;echo 100) | assert.progress
   local total=100
   local width=$(( $(tput cols) -10 ))
-  ([[ -t 0 ]] && echo "$@" || cat -) | while read -r l; do
+  str.stream "$@" | while read -r l; do
     local cur="$(echo ${l/#/} | awk '{printf("%d\n",$1 + 0.5)}')"
     [[ "${cur}" -gt "${total}" ]] && cur="${total}"
     local p=$(( cur * width / total ))

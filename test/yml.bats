@@ -281,3 +281,97 @@ EOS
   [ "${output}" == '''Member.0.name=Sato
 Member.1.name=Suzuki''' ]
 }
+
+@test "yml.toEnv -p : 入力ストリームに接頭語を付ける" {
+  run yml.toEnv -p 'APP_' <<EOS
+key: value
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'APP_key="value"' ]
+}
+
+@test "yml.toEnv -p : 入力ファイルに接頭語を付ける" {
+  local f="${BATS_TEST_TMPDIR}/test.yml"
+  echo 'key: value' > "$f"
+  run yml.toEnv -p 'APP_' "$f"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'APP_key="value"' ]
+}
+
+@test "yml.toEnv : 入力ファイルと入力ストリームの両方がある場合は入力ファイルを優先する" {
+  local f="${BATS_TEST_TMPDIR}/test.yml"
+  echo 'key: file' > "$f"
+  run bash -c "source '$BATS_TEST_DIRNAME/../lib/yml'; echo 'key: pipe' | yml.toEnv '$f'"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'key="file"' ]
+}
+
+@test "yml.toProperties -p : 入力ファイルに接頭語を付ける" {
+  local f="${BATS_TEST_TMPDIR}/test.yml"
+  echo 'key: value' > "$f"
+  run yml.toProperties -p 'app.' "$f"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'app.key=value' ]
+}
+
+@test "yml.grep -f : 入力ファイルを grep オプション付きで検索する" {
+  local f="${BATS_TEST_TMPDIR}/test.yml"
+  printf 'Name: Sato\nage: 20\n' > "$f"
+  run yml.grep -f "$f" -i 'name'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'Name=Sato' ]
+}
+
+@test "yml.toEnv : - を標準入力として読む" {
+  run yml.toEnv -p 'APP_' - <<EOS
+key: value
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'APP_key="value"' ]
+}
+
+@test "yml.toProperties : - を標準入力として読む" {
+  run yml.toProperties - <<EOS
+key: value
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'key=value' ]
+}
+
+@test "yml.grep -f : - を標準入力として読む" {
+  run yml.grep -f - 'name' <<EOS
+name: Sato
+age: 20
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'name=Sato' ]
+}
+
+@test "yml.toEnv : ファイルと - を指定順に連結する" {
+  local f="${BATS_TEST_TMPDIR}/a.yml"
+  echo 'a: file' > "$f"
+  run yml.toEnv "$f" - <<EOS
+b: pipe
+EOS
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'a="file"
+b="pipe"' ]
+}

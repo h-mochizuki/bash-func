@@ -200,14 +200,10 @@ arr.excludes() {
   # 配列から指定した要素を取り除きます
   # opt: c 除外対象文字列
   # opt: r 除外対象正規表現
+  # input-stream 配列（1行1要素。param1+ が指定された場合は無視）
   # param1+ 配列
   # stdout 指定要素を取り除いた配列
   local args=("$@")
-  [[ -t 0 ]] || {
-    while read line; do
-      args+=("${line}")
-    done <<< $(cat -)
-  }
   local exclude_context=()
   local exclude_regex=()
   local items=()
@@ -241,6 +237,13 @@ arr.excludes() {
         ;;
     esac
   done
+  # 配列が指定されなかった場合のみ、入力ストリームを1行1要素として扱う
+  if [[ "${#items[@]}" -eq 0 ]] && [[ ! -t 0 ]];then
+    local line
+    while IFS= read -r line || [[ -n "${line}" ]]; do
+      items+=("${line}")
+    done
+  fi
   for item in "${items[@]}"; do
     exclude_flag=false
     for exclude in "${exclude_context[@]}"; do

@@ -550,3 +550,141 @@ c''' ]
 |   |
 -----' ]
 }
+
+@test "str.trim -n : while-read ループ内で -n を指定すれば入力ストリームを読まない" {
+  run bash -c "source '$BATS_TEST_DIRNAME/../lib/str'; printf 'l1\nl2\n' | while read -r l; do str.trim -n \"  \${l}  \"; done"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'l1
+l2' ]
+}
+
+@test "str.toUpper : 引数と入力ストリームの両方がある場合は引数の後に入力ストリームを出力する" {
+  run bash -c "source '$BATS_TEST_DIRNAME/../lib/str'; echo 'pipe' | str.toUpper 'arg'"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'ARG
+PIPE' ]
+}
+
+@test "str.toUpper -n : 入力ストリームを読まない" {
+  run bash -c "source '$BATS_TEST_DIRNAME/../lib/str'; echo 'pipe' | str.toUpper -n 'arg'"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'ARG' ]
+}
+
+@test "str.indexOf : 入力文字列と入力ストリームの両方がある場合は入力文字列を優先する" {
+  run bash -c "source '$BATS_TEST_DIRNAME/../lib/str'; echo 'zzzhoge' | str.indexOf 'hoge' '1hoge'"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" -eq 1 ]
+}
+
+@test "str.base64 : 入力ストリーム" {
+  run str.base64 <<< 'abc'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'YWJjCg' ]
+}
+
+@test "str.evalfile : - を標準入力として読む" {
+  run str.evalfile - <<< '$((1 + 2))'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '3' ]
+}
+
+# ----------------
+#  引数と入力ストリームの併用
+# ----------------
+@test "str.stream : 引数の後に入力ストリームを出力する" {
+  run str.stream 'arg1' 'arg2' <<< 'pipe'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'arg1 arg2
+pipe' ]
+}
+
+@test "str.stream -n : 入力ストリームを読まない" {
+  run str.stream -n 'arg' <<< 'pipe'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'arg' ]
+}
+
+@test "str.stream : 入力ストリームが空なら引数だけを出力する（余分な空行を出さない）" {
+  run bash -c "source '$BATS_TEST_DIRNAME/../lib/str'; printf '' | str.stream 'arg' | wc -l"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" -eq 1 ]
+}
+
+@test "str.stream : /dev/null は読まない" {
+  run str.stream 'arg' < /dev/null
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'arg' ]
+}
+
+@test "str.stream : echo のオプションと同じ文字列も出力できる" {
+  run str.stream -n '-e'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '-e' ]
+}
+
+@test "str.initial : 引数の後に入力ストリームを1行ずつ処理する" {
+  run str.initial 'ab' 'cd' <<< 'ef'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'a
+c
+e' ]
+}
+
+@test "str.trim : 引数の後に入力ストリームを処理する" {
+  run str.trim '  ab  ' <<< '  cd  '
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'ab
+cd' ]
+}
+
+@test "str.take -n : 入力ストリームを読まない" {
+  run str.take -n 3 '12345' <<< 'abcde'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '123' ]
+}
+
+@test "str.take : 引数の後に入力ストリームを処理する" {
+  run str.take 3 '12345' <<< 'abcde'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '123
+abc' ]
+}
+
+@test "str.fill -n : 入力ストリームを読まない" {
+  run str.fill -n 5 '0' 'abc' <<< 'xyz'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'abc00' ]
+}

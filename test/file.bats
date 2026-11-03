@@ -189,3 +189,75 @@ $(
 abcdefg
 67890""" ]
 }
+
+# ----------------
+#  - を標準入力とみなす（Unix 互換）
+# ----------------
+@test "file.stream : - を標準入力として読む" {
+  run file.stream - <<< 'pipe'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'pipe' ]
+}
+
+@test "file.stream : ファイルと - を指定順に連結する" {
+  local f="${BATS_TEST_TMPDIR}/a.txt"
+  echo 'file' > "$f"
+  run file.stream "$f" - <<< 'pipe'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'file
+pipe' ]
+}
+
+@test "file.stream : - とファイルを指定順に連結する" {
+  local f="${BATS_TEST_TMPDIR}/a.txt"
+  echo 'file' > "$f"
+  run file.stream - "$f" <<< 'pipe'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'pipe
+file' ]
+}
+
+@test "file.eval : - を標準入力として読む" {
+  run file.eval - <<< '$((1 + 2))'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == '3' ]
+}
+
+@test "file.eachLine : ファイル未指定の場合は標準入力を読む" {
+  run file.eachLine <<< 'a b
+c'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'a b
+c' ]
+}
+
+@test "file.eachLine : ファイルと - を指定順に連結する" {
+  local f="${BATS_TEST_TMPDIR}/a.txt"
+  echo 'file' > "$f"
+  run file.eachLine "$f" - <<< 'pipe'
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'file
+pipe' ]
+}
+
+@test "file.eachLine : 空白を含むファイル名" {
+  local f="${BATS_TEST_TMPDIR}/a b.txt"
+  echo 'file' > "$f"
+  run file.eachLine "$f"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == 'file' ]
+}

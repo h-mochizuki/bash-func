@@ -104,12 +104,13 @@ file.size() {
 
 file.stream() {
   # 指定されたファイルもしくは入力ストリームをストリームとして返します
+  # ファイルが指定された場合は、入力ストリームより優先します
   # input-stream 入力ストリーム
-  # param1+ ファイルパス
+  # param1+ ファイルパス（- は入力ストリーム。複数指定時は連結）
   # stdout ストリーム
-  if [ -t 0 ]; then
-    [[ "$#" -ne 0 ]] && cat "$@"
-  else
+  if [[ "$#" -ne 0 ]];then
+    cat "$@"
+  elif [[ ! -t 0 ]];then
     cat -
   fi
 }
@@ -163,23 +164,23 @@ file.isSame() {
 
 file.eval() {
   # ファイルに含まれる環境変数やスクリプトを評価した文字列を返します
+  # ファイルが指定された場合は、入力ストリームより優先します
   # input-stream 入力ストリーム
-  # param1 ファイルパス
+  # param1 ファイルパス（- は入力ストリーム）
   # stdout 環境変数やスクリプトを評価した文字列
-  if [ -t 0 ]; then
-    [[ "$#" -ne 0 ]] && cat "$1"
-  else
-    cat -
-  fi | eval "echo -e \"$(cat)\""
+  file.stream "${@:1:1}" | eval "echo -e \"$(cat)\""
 }
 
 file.eachLine() {
   # ファイル内容を一行ずつ出力します
-  # param1 ファイルパス
+  # ファイルが指定された場合は、入力ストリームより優先します
+  # input-stream 入力ストリーム
+  # param1+ ファイルパス（- は入力ストリーム。複数指定時は連結）
   # stdout 一行ずつのファイル内容
-  for line in "$(cat $@)";do
-    echo "$line"
-  done
+  local line
+  while IFS= read -r line || [[ -n "${line}" ]]; do
+    echo "${line}"
+  done < <(file.stream "$@")
 }
 
 dir.tree() (

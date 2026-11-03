@@ -214,7 +214,7 @@ log.to() {
   # 対象処理を実施してログをファイルに出力します
   # input-stream 入力ストリーム
   # param1 ログファイル名（デフォルト: <ファイル名>_<タイムスタンプ>.log）
-  # param2+ 対象処理（入力ストリーム優先）
+  # param2+ 対象処理（指定された場合は、入力ストリームより優先）
   # globals LOG_FILE, LOG_DIR, TIMESTAMP_FORMAT（参照）
   # stdout 対象処理の出力
   # ----
@@ -247,11 +247,9 @@ log.to() {
     mkdir -p "$dir"
     echo "'$dir' is ceated."
   fi
-  if [ -t 0 ]; then
-    if [ "${cmd:+_}" == "_" ];then
-      "$cmd" "${args[@]}" 2>&1 | tee -a "$logfile"
-    fi
-  else
+  if [ "${cmd:+_}" == "_" ];then
+    "$cmd" "${args[@]}" 2>&1 | tee -a "$logfile"
+  elif [ ! -t 0 ];then
     cat - | tee -a "$logfile"
   fi
 }

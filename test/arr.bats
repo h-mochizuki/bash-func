@@ -635,3 +635,21 @@ Oops ..." ]
   [ "${err}" == "" ]
 }
 
+
+@test "arr.excludes : 引数と入力ストリームの両方がある場合は引数を優先する" {
+  run bash -c "source '$BATS_TEST_DIRNAME/../lib/arr'; echo 'pipe' | arr.excludes -c 'sed' 'I' 'sed' 'and'"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "I
+and" ]
+}
+
+@test "arr.excludes : 入力ストリームの行頭ハイフンもオプションではなく要素として扱う" {
+  run arr.excludes -c "sed" <<<"-x
+sed"
+  echo "status: ${status}"
+  echo "output: ${output}"
+  [ "$status" -eq 0 ]
+  [ "${output}" == "-x" ]
+}
